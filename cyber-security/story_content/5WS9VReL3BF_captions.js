@@ -1,0 +1,1 @@
+window.globalLoadJsAsset('story_content/5WS9VReL3BF_captions.js', {"captions":[{"langCode":"en-US","data":"WEBVTT%0D%0A%0D%0ANOTE%0D%0AKind:%20captions%0D%0ASource:%20Articulate%20Closed%20Captions%20Editor%0D%0ASource%20Version:%203.105.35604.0%0D%0A%0D%0A00:00:02.319%20--%3E%2000:00:04.329%0D%0AThe%20time%20lock%20has%20been%20released.%0D%0A%0D%0A"}]})
