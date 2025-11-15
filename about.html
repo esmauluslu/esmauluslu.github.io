@@ -18,6 +18,9 @@
             color: #75c281;
             min-height: 100vh;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
         }
 
         /* Welcome Screen Styles */
@@ -156,12 +159,6 @@
 
         .main-content.show {
             opacity: 1;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            scroll-behavior: smooth;
         }
 
         nav {
@@ -391,7 +388,7 @@
     <!-- Video Screen -->
     <div class="video-screen" id="videoScreen">
         <div class="video-container">
-            <video id="introVideo" playsinline autoplay>
+            <video id="introVideo" playsinline>
                 <source src="intro-video.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -514,15 +511,16 @@
             setTimeout(() => {
                 welcomeScreen.classList.add('hidden');
                 videoScreen.classList.add('show');
-                introVideo.play();
+                // Play video AFTER welcome screen is gone and video screen is shown
+                setTimeout(() => {
+                    introVideo.play();
+                }, 100);
             }, 800);
         }, 2000);
 
-        // Step 2: When video ends, wait 3 seconds then show main content
+        // Step 2: When video ends, immediately show main content
         introVideo.addEventListener('ended', () => {
-            setTimeout(() => {
-                showMainContent();
-            }, 3000);
+            showMainContent();
         });
 
         // Skip button functionality
