@@ -4,72 +4,306 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        
+        #toolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover { background: #2980b9; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        button.active { background: #e74c3c; }
+        
+        .tool-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .tool-group label {
+            color: white;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        
+        input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 2px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        input[type="range"] {
+            width: 100px;
+            cursor: pointer;
+        }
+        
+        #widthValue {
+            color: white;
+            font-weight: bold;
+            min-width: 25px;
+            text-align: center;
+        }
+        
+        #pdf-container {
+            margin-top: 70px;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+            height: calc(100vh - 70px);
+        }
+        
+        .page-wrapper {
+            position: relative;
+            margin: 20px auto;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background: white;
+            border-radius: 3px;
             overflow: hidden;
         }
-        #viewer {
-            width: 100%;
-            height: 100%;
+        
+        canvas { display: block; }
+        
+        .draw-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
+        
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #666;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .download-btn {
+            background: #27ae60 !important;
+        }
+        
+        .download-btn:hover {
+            background: #229954 !important;
         }
     </style>
 </head>
 <body>
-    <div id="viewer"></div>
+    <div id="loading">PDF yükleniyor...</div>
     
-    <script src="https://unpkg.com/@pdftron/webviewer@10/public/lib/webviewer.min.js"></script>
+    <div id="toolbar" style="display: none;">
+        <button id="penBtn" onclick="setTool('pen')" class="active">✏️ Kalem</button>
+        <button id="eraserBtn" onclick="setTool('eraser')">🧹 Silgi</button>
+        <button onclick="clearAll()">🗑️ Temizle</button>
+        
+        <div class="tool-group">
+            <label>Renk:</label>
+            <input type="color" id="colorPicker" value="#ff0000">
+        </div>
+        
+        <div class="tool-group">
+            <label>Kalınlık:</label>
+            <input type="range" id="lineWidth" min="1" max="20" value="3">
+            <span id="widthValue">3</span>
+        </div>
+        
+        <button onclick="downloadPDF()" class="download-btn">💾 PDF İndir</button>
+    </div>
+    
+    <div id="pdf-container"></div>
+    
     <script>
-        WebViewer({
-            path: 'https://unpkg.com/@pdftron/webviewer@10/public',
-            initialDoc: 'https://resplendent-cheesecake-496ff3.netlify.app/hrtoolkit.pdf',
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        // PDF URL'inizi buraya yazın
+        const pdfUrl = 'https://esmauluslu.github.io/risetest/hrtoolkit.pdf';
+        
+        let pages = [];
+        let currentTool = 'pen';
+        let currentColor = '#ff0000';
+        let lineWidth = 3;
+        
+        // PDF'i yükle
+        pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('toolbar').style.display = 'flex';
             
-            // Özellikler
-            fullAPI: true,
-            enableAnnotations: true,
-            enableMeasurement: true,
-            enableRedaction: false,
-            
-            // Türkçe dil desteği (opsiyonel)
-            // l: 'tr',
-            
-        }, document.getElementById('viewer')).then(instance => {
-            const { UI, Core } = instance;
-            
-            // Düzenlenmiş PDF'i indirme fonksiyonu
-            UI.setHeaderItems(header => {
-                header.push({
-                    type: 'actionButton',
-                    img: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
-                    title: 'İndir',
-                    onClick: async () => {
-                        const doc = Core.documentViewer.getDocument();
-                        const xfdfString = await Core.annotationManager.exportAnnotations();
-                        const data = await doc.getFileData({
-                            xfdfString,
-                            flatten: true // Çizimleri PDF'e yapıştır
-                        });
-                        const arr = new Uint8Array(data);
-                        const blob = new Blob([arr], { type: 'application/pdf' });
-                        
-                        // İndirme
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = 'edited-hrtoolkit.pdf';
-                        link.click();
-                    }
-                });
-            });
-
-            // Varsayılan araçları göster
-            UI.enableFeatures([UI.Feature.Annotations]);
-            UI.enableFeatures([UI.Feature.Download]);
-            
-            console.log('PDF Editor hazır!');
+            for (let i = 1; i <= pdf.numPages; i++) {
+                renderPage(pdf, i);
+            }
+        }).catch(error => {
+            document.getElementById('loading').innerHTML = 'PDF yüklenemedi: ' + error.message + '<br><br>PDF yolu: ' + pdfUrl;
+            console.error('PDF yükleme hatası:', error);
         });
+        
+        function renderPage(pdf, pageNum) {
+            pdf.getPage(pageNum).then(page => {
+                const scale = 1.5;
+                const viewport = page.getViewport({ scale });
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'page-wrapper';
+                
+                // PDF canvas
+                const pdfCanvas = document.createElement('canvas');
+                const context = pdfCanvas.getContext('2d');
+                pdfCanvas.width = viewport.width;
+                pdfCanvas.height = viewport.height;
+                
+                page.render({ canvasContext: context, viewport: viewport });
+                
+                // Çizim canvas
+                const drawCanvas = document.createElement('canvas');
+                drawCanvas.className = 'draw-canvas';
+                drawCanvas.width = viewport.width;
+                drawCanvas.height = viewport.height;
+                const drawCtx = drawCanvas.getContext('2d');
+                drawCtx.lineCap = 'round';
+                drawCtx.lineJoin = 'round';
+                
+                let isDrawing = false;
+                let lastX = 0, lastY = 0;
+                
+                function startDrawing(e) {
+                    isDrawing = true;
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    lastX = clientX - rect.left;
+                    lastY = clientY - rect.top;
+                }
+                
+                function draw(e) {
+                    if (!isDrawing) return;
+                    e.preventDefault();
+                    
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                    const x = clientX - rect.left;
+                    const y = clientY - rect.top;
+                    
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(lastX, lastY);
+                    drawCtx.lineTo(x, y);
+                    
+                    if (currentTool === 'pen') {
+                        drawCtx.strokeStyle = currentColor;
+                        drawCtx.lineWidth = lineWidth;
+                        drawCtx.globalCompositeOperation = 'source-over';
+                    } else {
+                        drawCtx.globalCompositeOperation = 'destination-out';
+                        drawCtx.lineWidth = lineWidth * 2;
+                    }
+                    
+                    drawCtx.stroke();
+                    lastX = x;
+                    lastY = y;
+                }
+                
+                function stopDrawing() { isDrawing = false; }
+                
+                // Mouse events
+                drawCanvas.addEventListener('mousedown', startDrawing);
+                drawCanvas.addEventListener('mousemove', draw);
+                drawCanvas.addEventListener('mouseup', stopDrawing);
+                drawCanvas.addEventListener('mouseout', stopDrawing);
+                
+                // Touch events
+                drawCanvas.addEventListener('touchstart', startDrawing);
+                drawCanvas.addEventListener('touchmove', draw);
+                drawCanvas.addEventListener('touchend', stopDrawing);
+                
+                wrapper.appendChild(pdfCanvas);
+                wrapper.appendChild(drawCanvas);
+                document.getElementById('pdf-container').appendChild(wrapper);
+                
+                pages.push({ pdfCanvas, drawCanvas });
+            });
+        }
+        
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('#toolbar button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tool === 'pen' ? 'penBtn' : 'eraserBtn').classList.add('active');
+        }
+        
+        function clearAll() {
+            if (confirm('Tüm çizimleri silmek istediğinizden emin misiniz?')) {
+                pages.forEach(page => {
+                    page.drawCanvas.getContext('2d').clearRect(0, 0, page.drawCanvas.width, page.drawCanvas.height);
+                });
+            }
+        }
+        
+        document.getElementById('colorPicker').addEventListener('change', e => currentColor = e.target.value);
+        document.getElementById('lineWidth').addEventListener('input', e => {
+            lineWidth = e.target.value;
+            document.getElementById('widthValue').textContent = lineWidth;
+        });
+        
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: pages[0].pdfCanvas.width > pages[0].pdfCanvas.height ? 'l' : 'p',
+                unit: 'px',
+                format: [pages[0].pdfCanvas.width, pages[0].pdfCanvas.height]
+            });
+            
+            for (let i = 0; i < pages.length; i++) {
+                const mergedCanvas = document.createElement('canvas');
+                mergedCanvas.width = pages[i].pdfCanvas.width;
+                mergedCanvas.height = pages[i].pdfCanvas.height;
+                const ctx = mergedCanvas.getContext('2d');
+                
+                ctx.drawImage(pages[i].pdfCanvas, 0, 0);
+                ctx.drawImage(pages[i].drawCanvas, 0, 0);
+                
+                const imgData = mergedCanvas.toDataURL('image/jpeg', 1.0);
+                
+                if (i > 0) pdf.addPage([pages[i].pdfCanvas.width, pages[i].pdfCanvas.height]);
+                pdf.addImage(imgData, 'JPEG', 0, 0, pages[i].pdfCanvas.width, pages[i].pdfCanvas.height);
+            }
+            
+            pdf.save('edited-hrtoolkit.pdf');
+        }
     </script>
 </body>
 </html>
