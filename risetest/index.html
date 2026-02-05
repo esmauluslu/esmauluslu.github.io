@@ -3,77 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Annotator</title>
+    <title>PDF Editor</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
         }
-        #adobe-dc-view {
+        #viewer {
             width: 100%;
             height: 100%;
-        }
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: Arial, sans-serif;
-            font-size: 18px;
-            color: #666;
         }
     </style>
 </head>
 <body>
-    <div id="loading">PDF yükleniyor...</div>
-    <div id="adobe-dc-view"></div>
+    <div id="viewer"></div>
     
-    <script src="https://documentservices.adobe.com/view-sdk/viewer.js"></script>
-    <script type="text/javascript">
-        // Adobe SDK'nın yüklenmesini bekle
-        if (window.AdobeDC) {
-            initViewer();
-        } else {
-            document.addEventListener("adobe_dc_view_sdk.ready", initViewer);
-        }
-        
-        function initViewer() {
-            document.getElementById('loading').style.display = 'none';
+    <script src="https://unpkg.com/@pdftron/webviewer@10/public/lib/webviewer.min.js"></script>
+    <script>
+        WebViewer({
+            path: 'https://unpkg.com/@pdftron/webviewer@10/public',
+            initialDoc: 'https://resplendent-cheesecake-496ff3.netlify.app/hrtoolkit.pdf',
             
-            var adobeDCView = new AdobeDC.View({
-                clientId: "d94ed46238654231b862219c1c6d8c0e",
-                divId: "adobe-dc-view"
-            });
+            // Özellikler
+            fullAPI: true,
+            enableAnnotations: true,
+            enableMeasurement: true,
+            enableRedaction: false,
             
-            // PDF URL'ini kontrol edin - repository adınıza göre güncelleyin
-            const pdfUrl = "https://esmauluslu.github.io/risetest/hrtoolkit.pdf";
+            // Türkçe dil desteği (opsiyonel)
+            // l: 'tr',
             
-            adobeDCView.previewFile({
-                content: {
-                    location: {
-                        url: pdfUrl
+        }, document.getElementById('viewer')).then(instance => {
+            const { UI, Core } = instance;
+            
+            // Düzenlenmiş PDF'i indirme fonksiyonu
+            UI.setHeaderItems(header => {
+                header.push({
+                    type: 'actionButton',
+                    img: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
+                    title: 'İndir',
+                    onClick: async () => {
+                        const doc = Core.documentViewer.getDocument();
+                        const xfdfString = await Core.annotationManager.exportAnnotations();
+                        const data = await doc.getFileData({
+                            xfdfString,
+                            flatten: true // Çizimleri PDF'e yapıştır
+                        });
+                        const arr = new Uint8Array(data);
+                        const blob = new Blob([arr], { type: 'application/pdf' });
+                        
+                        // İndirme
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'edited-hrtoolkit.pdf';
+                        link.click();
                     }
-                },
-                metaData: {
-                    fileName: "HR Toolkit.pdf"
-                }
-            }, {
-                embedMode: "FULL_WINDOW",
-                showDownloadPDF: true,
-                showPrintPDF: true,
-                showAnnotationTools: true,
-                enableAnnotationAPIs: true,
-                includePDFAnnotations: true,
-                showLeftHandPanel: true,
-                showPageControls: true
-            }).catch(error => {
-                console.error("PDF yükleme hatası:", error);
-                document.getElementById('loading').innerHTML = "PDF yüklenemedi. Hata: " + error.message;
-                document.getElementById('loading').style.display = 'block';
+                });
             });
-        }
+
+            // Varsayılan araçları göster
+            UI.enableFeatures([UI.Feature.Annotations]);
+            UI.enableFeatures([UI.Feature.Download]);
+            
+            console.log('PDF Editor hazır!');
+        });
     </script>
 </body>
 </html>
