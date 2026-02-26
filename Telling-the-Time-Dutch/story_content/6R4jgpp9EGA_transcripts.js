@@ -1,0 +1,5 @@
+
+(function() {
+    const data = {"transcripts":[{"name":"captions","cues":[{"start":50,"text":"Our reference point is now."},{"start":2660,"text":"Whole faith"},{"start":5650,"text":"So what about 4:25?"},{"start":9460,"text":"That's 5 minutes before 5:30."},{"start":13289,"text":"Now let's see this in Dutch,"},{"start":15359,"text":"V for whole faith."},{"start":19520,"text":"And how do we say 4:35?"},{"start":23639,"text":"5 minutes after 5:30."},{"start":26430,"text":"Now let's see this in Dutch."},{"start":28569,"text":"We over whole faith."},{"start":32628,"text":"Do you see the pattern?"},{"start":33988,"text":"Everything revolves around the half mark."},{"start":36109,"text":"It's the center of gravity."}]}]};
+    window.globalLoadJsAsset('story_content/6R4jgpp9EGA_transcripts.js', JSON.stringify(data));
+})();

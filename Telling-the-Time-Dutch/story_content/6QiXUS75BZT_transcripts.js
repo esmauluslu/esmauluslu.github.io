@@ -1,0 +1,5 @@
+
+(function() {
+    const data = {"transcripts":[{"name":"captions","cues":[{"start":90,"text":"Now let's move to the right side of the clock,"},{"start":1970,"text":"the past side."},{"start":4190,"text":"The magic word here is."},{"start":7230,"text":"Over"},{"start":8000,"text":"meaning past."},{"start":11399,"text":"The structure is simple minute plus over plus hour."},{"start":19020,"text":"Let's say 4:1:00."},{"start":22399,"text":"Dino revere"},{"start":25639,"text":"Easy,"},{"start":26370,"text":"logical,"},{"start":27250,"text":"manageable."},{"start":29120,"text":"Now here's a word that will level you up instantly."},{"start":34229,"text":"Quart meaning quarter."},{"start":38180,"text":"You'll hear it all the time."},{"start":41569,"text":"4:15"},{"start":43590,"text":"quarto for fear."}]}]};
+    window.globalLoadJsAsset('story_content/6QiXUS75BZT_transcripts.js', JSON.stringify(data));
+})();
