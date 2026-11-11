@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dutch for Daily Life: Supermarkt</title>
+<link rel="stylesheet" href="shared/reel.css">
+<style>
+body { background: #EAF5EC url(img/cover_gingham.jpg) 0 0 / 230px auto repeat; }
+/* Course shell: one SCORM session, an episode menu, and a 9:16 frame the episodes play in */
+.shell { width: min(100%, 430px, calc((100dvh - 90px) * 9 / 16)); min-width: 280px; display: flex; flex-direction: column; gap: 8px; margin: 0 auto; }
+.shell-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; }
+.shell-bar .back { font: inherit; font-weight: 700; font-size: 14px; background: none; border: none; color: var(--accent); cursor: pointer; padding: 4px 0; }
+.shell-bar .back, .bar-right { display: flex; align-items: center; gap: 6px; }
+.fsbtn { font: inherit; font-weight: 700; font-size: 13px; border: none; border-radius: 999px; padding: 5px 11px; background: var(--brand-green); color: #12301C; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,.15); }
+/* full screen: like watching reels. Phone = edge to edge; computer = a tall 9:16 screen on a dark backdrop */
+html.fs body { background: #0E1310 !important; padding: 0 !important; display: flex; justify-content: center; }
+html.fs .shell { box-sizing: border-box; width: min(100vw, calc((100dvh - 52px) * 9 / 16)); height: 100dvh; gap: 4px; padding: 6px 0 8px; }
+html.fs .frame { flex: 1; aspect-ratio: auto; border-radius: 18px; }
+@media (max-width: 520px) { html.fs .shell { width: 100vw; padding-top: 0; } html.fs .frame { border-radius: 0; } }
+.shell-bar .where { background: rgba(255,255,255,.9); border-radius: 999px; padding: 4px 10px; }
+.shell-bar .where { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.frame { position: relative; aspect-ratio: 9 / 16; width: 100%; border-radius: 22px; overflow: hidden; background: #EAF5EC url(img/cover_gingham.jpg) center / cover; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+/* phones: no decorative frame, the course fills the whole screen */
+@media (max-width: 520px) {
+  body { padding: 0 !important; }
+  .shell { width: 100%; min-width: 0; height: 100dvh; gap: 0; }
+  .shell-bar { padding: 4px 8px; min-height: 34px; }
+  .frame { flex: 1; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+}
+.frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.menu { position: absolute; inset: 0; overflow-y: auto; padding: 16px 12px; color: var(--brand-ink); background: #EAF5EC url(img/cover_gingham.jpg) center / cover; }
+.menucard { background: rgba(255,253,249,.96); border-radius: 22px; padding: 18px 14px 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 22px rgba(31,51,38,.15); }
+.menu .course { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-green-text); }
+.menu h1 { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.05; margin: 0; }
+.menu .lead { margin: 0; font-size: 14px; color: var(--brand-ink-soft); }
+.me { display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: 1.5px solid var(--brand-pink); border-radius: 14px; padding: 8px 10px; font-size: 14px; }
+.me svg { width: 40px; height: 40px; flex: none; }
+.me .link { color: var(--brand-green-text); }
+.progress { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--brand-ink-soft); }
+.bar { height: 8px; border-radius: 4px; background: #FFFFFF; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand-green); border-radius: 4px; transition: width .4s; }
+.eps { display: flex; flex-direction: column; gap: 8px; }
+.ep { font: inherit; text-align: left; display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; background: #FFFFFF; color: var(--brand-ink); border: 1.5px solid var(--brand-pink); border-radius: 16px; padding: 10px 12px; cursor: pointer; }
+.ep:hover:not([disabled]) { border-color: var(--brand-green); }
+.ep[disabled] { cursor: default; opacity: .62; }
+.ep .num { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--brand-blush); }
+.ep.done .num { background: var(--brand-mint); color: var(--brand-green-text); }
+.ep.next { border-color: var(--brand-green); }
+.ep.next .num { background: var(--brand-green); color: #12301C; }
+.ep strong { display: block; font-size: 15px; }
+.ep small { color: var(--brand-ink-soft); font-size: 12px; }
+.pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.pill.done { background: var(--brand-mint); color: var(--brand-green-text); }
+.pill.go { background: var(--brand-green); color: #12301C; }
+.pill.soon { background: var(--brand-cream); color: #5A4A10; }
+.toast { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--brand-ink); color: #FFFFFF; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
+.credits { font-size: 11px; color: var(--brand-ink-soft); margin-top: auto; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="shell-bar">
+    <button class="back" id="backBtn" type="button" hidden>← All episodes</button>
+    <span class="bar-right"><span class="where" id="where">Supermarkt</span><button class="fsbtn" id="fsBtn" type="button" aria-label="Full screen">⛶ Full screen</button></span>
+  </div>
+  <div class="frame" id="frame">
+    <div class="menu" id="menu"></div>
+    <iframe id="player" title="Episode" hidden allow="autoplay"></iframe>
+    <div class="toast" id="toast" hidden></div>
+  </div>
+</div>
+
+<script src="shared/bridge.js"></script>
+<script>
+/* Full-screen button: real full screen where the browser allows it; otherwise (iPhone, locked-down iframes)
+   the course iframe is stretched over the whole Moodle page. */
+(function () {
+  let fe = null, pw = null;
+  try { fe = window.frameElement; pw = window.parent; } catch (e) {}
+  let on = false, saved = '';
+  const btn = () => document.getElementById('fsBtn');
+  function label() { const b = btn(); if (b) b.textContent = on ? '✕ Exit full screen' : '⛶ Full screen'; document.documentElement.classList.toggle('fs', on); }
+  function pseudo(enable) {
+    if (!fe) return;
+    if (enable) { saved = fe.getAttribute('style') || ''; fe.setAttribute('style', saved + ';position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:0!important;max-width:none!important;z-index:2147483000!important;border:0!important;background:#0E1310'); try { pw.document.documentElement.style.overflow = 'hidden'; } catch (e) {} }
+    else { fe.setAttribute('style', saved); try { pw.document.documentElement.style.overflow = ''; } catch (e) {} }
+  }
+  async function enter() {
+    on = true; label();
+    const target = fe || document.documentElement;
+    const req = target.requestFullscreen || target.webkitRequestFullscreen;
+    try { if (req) { await req.call(target); return; } } catch (e) {}
+    pseudo(true);
+  }
+  async function exit() {
+    on = false; label();
+    const d = fe ? pw.document : document;
+    try { if (d.fullscreenElement || d.webkitFullscreenElement) { await (d.exitFullscreen || d.webkitExitFullscreen).call(d); } } catch (e) {}
+    pseudo(false);
+    [50, 400, 1000].forEach(t => setTimeout(() => window.__fitFrame && window.__fitFrame(), t));
+  }
+  document.addEventListener('DOMContentLoaded', () => { const b = btn(); if (b) b.onclick = () => on ? exit() : enter(); });
+  try { (fe ? pw.document : document).addEventListener('fullscreenchange', () => { const d = fe ? pw.document : document; if (!d.fullscreenElement && on && !(fe && fe.style.position === 'fixed')) { on = false; label(); } }); } catch (e) {}
+})();
+</script>
+<script>
+/* Moodle shows SCORM in an iframe with a fixed height (the activity's "Height" setting, 500px by default),
+   which cuts the vertical course off. The package is served from the Moodle site itself, so it can resize
+   its own iframe: as tall as a 9:16 phone screen at the iframe's width, but never taller than the window. */
+(function () {
+  let fe = null, pw = null;
+  try { fe = window.frameElement; pw = window.parent; if (!fe || !pw || pw === window) return; } catch (e) { return; }
+  function fit() {
+    try {
+      const w = fe.getBoundingClientRect().width || fe.clientWidth;
+      const vh = pw.innerHeight;
+      const top = Math.max(0, fe.getBoundingClientRect().top);
+      if (document.documentElement.classList.contains('fs')) return;
+      const want = Math.round(Math.max(560, Math.min(w * 16 / 9 + 50, vh - Math.min(top, 120) - 12)));
+      fe.style.setProperty('height', want + 'px', 'important');
+      fe.style.setProperty('min-height', want + 'px', 'important');
+      let el = fe.parentElement;
+      for (let k = 0; k < 5 && el; k++, el = el.parentElement) {
+        const cs = pw.getComputedStyle(el);
+        if (parseFloat(cs.height) < want) { el.style.setProperty('height', 'auto', 'important'); el.style.setProperty('min-height', want + 'px', 'important'); }
+        if (cs.overflow === 'hidden' || cs.overflowY === 'hidden') el.style.setProperty('overflow', 'visible', 'important');
+      }
+    } catch (e) {}
+  }
+  window.__fitFrame = fit;
+  fit();
+  [300, 1000, 2500].forEach(t => setTimeout(fit, t));
+  try { pw.addEventListener('resize', () => setTimeout(fit, 120)); new pw.ResizeObserver(() => fit()).observe(fe.parentElement); } catch (e) {}
+})();
+</script>
+<script>
+/* ---------- SCORM 1.2 runtime: the shell is the only SCO and owns the session ---------- */
+const SCORM = (function () {
+  let api = null, live = false, done = false;
+  const t0 = Date.now();
+  function find(w) {
+    for (let i = 0; w && i < 12; i++) {
+      try { if (w.API) return w.API; } catch (e) { return null; }
+      if (w.parent === w) break;
+      w = w.parent;
+    }
+    return null;
+  }
+  function get(k) { try { return live ? String(api.LMSGetValue(k) || '') : ''; } catch (e) { return ''; } }
+  function set(k, v) { try { if (live) api.LMSSetValue(k, String(v)); } catch (e) {} }
+  function commit() { try { if (live) api.LMSCommit(''); } catch (e) {} }
+  function hms(ms) {
+    const s = Math.round(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60;
+    return String(h).padStart(4, '0') + ':' + String(m).padStart(2, '0') + ':' + String(r).padStart(2, '0');
+  }
+  function clock() { const d = new Date(); return [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':'); }
+  function init() {
+    try { api = find(window.parent !== window ? window.parent : window) || find(window) || (window.opener ? find(window.opener) : null); } catch (e) { api = null; }
+    if (!api) return false;
+    try { live = String(api.LMSInitialize('')) === 'true'; } catch (e) { live = false; }
+    if (live) {
+      const s = get('cmi.core.lesson_status');
+      if (!s || s === 'not attempted') { set('cmi.core.lesson_status', 'incomplete'); commit(); }
+    }
+    return live;
+  }
+  function load() { try { return JSON.parse(get('cmi.suspend_data') || '{}'); } catch (e) { return {}; } }
+  function save(state) { set('cmi.suspend_data', JSON.stringify(state).slice(0, 4096)); commit(); }
+  function interaction(id, response, result) {
+    if (!live) return;
+    const n = parseInt(get('cmi.interactions._count'), 10) || 0;
+    set('cmi.interactions.' + n + '.id', id);
+    set('cmi.interactions.' + n + '.type', 'fill-in');
+    set('cmi.interactions.' + n + '.student_response', String(response).slice(0, 255));
+    set('cmi.interactions.' + n + '.result', result || 'neutral');
+    set('cmi.interactions.' + n + '.time', clock());
+    commit();
+  }
+  function progress(doneCount, total) {
+    set('cmi.core.score.min', 0); set('cmi.core.score.max', 100);
+    set('cmi.core.score.raw', Math.round(doneCount / total * 100));
+    if (doneCount >= total) set('cmi.core.lesson_status', 'completed');
+    commit();
+  }
+  function finish() {
+    if (!live || done) return;
+    done = true;
+    set('cmi.core.session_time', hms(Date.now() - t0));
+    set('cmi.core.exit', get('cmi.core.lesson_status') === 'completed' ? '' : 'suspend');
+    commit();
+    try { api.LMSFinish(''); } catch (e) {}
+  }
+  window.addEventListener('pagehide', finish);
+  window.addEventListener('beforeunload', finish);
+  return { init, load, save, interaction, progress, finish, status: () => get('cmi.core.lesson_status'), score: () => get('cmi.core.score.raw'), get live() { return live; } };
+})();
+
+/* ---------- course state and the SHELL API the episodes call (via shared/bridge.js) ---------- */
+(function () {
+  const $ = id => document.getElementById(id);
+  const EPISODES = [
+    { n: 1, title: 'Supermarket secrets 🤫', min: 3, file: 'ep_tea.html' },
+    { n: 2, title: 'My first Dutch supermarket', min: 8, file: 'ep1.html' },
+    { n: 3, title: 'Your turn at the checkout', min: 4, file: 'ep3.html' },
+    { n: 4, title: 'You can do this! 💪', min: 7, file: 'ep4.html' }
+  ];
+  // the course counts as complete when every episode that exists in this build is done
+  const REQUIRED = EPISODES.filter(e => e.file).map(e => e.n);
+
+  SCORM.init();
+  let state = SCORM.load();
+  if (!SCORM.live) { try { state = JSON.parse(localStorage.getItem('dfdl-supermarkt-shell') || '{}'); } catch (e) { state = {}; } }
+  state.done = state.done || [];
+  function persist() {
+    if (SCORM.live) SCORM.save(state);
+    else { try { localStorage.setItem('dfdl-supermarkt-shell', JSON.stringify(state)); } catch (e) {} }
+  }
+
+  function toast(text) { const t = $('toast'); t.textContent = text; t.hidden = false; setTimeout(() => { t.hidden = true; }, 2600); }
+
+  function showMenu() {
+    $('player').hidden = true; $('player').src = 'about:blank';
+    $('menu').hidden = false; $('backBtn').hidden = true; $('where').textContent = 'Supermarkt';
+    const doneCount = state.done.filter(n => REQUIRED.includes(n)).length;
+    const next = EPISODES.find(e => e.file && !state.done.includes(e.n));
+    $('menu').innerHTML = `<div class="menucard">
+      <span class="course">Dutch for Daily Life</span>
+      <h1>Supermarkt</h1>
+      <p class="lead">Four short episodes. Do them on the bus, in the queue, wherever you are.</p>
+      ${state.char ? `<div class="me">${Bridge.portrait(state.char)}<span>Shopping as <b>${state.char}</b> · <button class="link" type="button" id="changeChar">change</button></span></div>` : ''}
+      <div class="progress"><span>${state.done.length} of ${EPISODES.length} episodes done</span><div class="bar"><i style="width:${state.done.length / EPISODES.length * 100}%"></i></div></div>
+      <div class="eps">${EPISODES.map(e => {
+        const isDone = state.done.includes(e.n), isNext = next && next.n === e.n;
+        const pill = !e.file ? '<span class="pill soon">Coming soon</span>' : isDone ? '<span class="pill done">Done ✓</span>' : isNext ? '<span class="pill go">Start ▶</span>' : '';
+        return `<button class="ep${isDone ? ' done' : ''}${isNext ? ' next' : ''}" type="button" data-n="${e.n}" ${e.file ? '' : 'disabled'}>
+          <span class="num">${isDone ? '✓' : e.n}</span><span><strong>${e.title}</strong><small>Episode ${e.n} · ${e.min} min</small></span>${pill}</button>`;
+      }).join('')}</div></div>`;
+    document.querySelectorAll('.ep').forEach(b => b.onclick = () => openEpisode(Number(b.dataset.n)));
+    if ($('changeChar')) $('changeChar').onclick = () => { delete state.char; persist(); showMenu(); toast('Choose your character in the next episode'); };
+  }
+
+  function openEpisode(n) {
+    const ep = EPISODES.find(e => e.n === n);
+    if (!ep || !ep.file) { showMenu(); toast(`Episode ${n} is coming soon`); return; }
+    $('menu').hidden = true; $('backBtn').hidden = false;
+    $('where').textContent = `Episode ${n} of ${EPISODES.length}`;
+    $('player').hidden = false; $('player').src = ep.file;
+    $('player').focus();
+  }
+
+  window.SHELL = {
+    getChar: () => state.char || '',
+    setChar: c => { state.char = c; persist(); },
+    getData: k => state[k],
+    setData: (k, v) => { state[k] = v; persist(); },
+    interaction: (id, response, result) => SCORM.interaction(id, response, result),
+    episodeDone: n => {
+      if (!state.done.includes(n)) state.done.push(n);
+      persist();
+      SCORM.progress(state.done.filter(x => REQUIRED.includes(x)).length, REQUIRED.length);
+    },
+    openEpisode,
+    showMenu,
+    lmsStatus: () => ({ live: SCORM.live, status: SCORM.status(), score: SCORM.score(), done: state.done.filter(x => REQUIRED.includes(x)).length, total: REQUIRED.length })
+  };
+
+  $('backBtn').onclick = showMenu;
+  // first visit: go straight into Episode 1; afterwards, open on the episode menu to resume
+  if (!state.done.length && !state.char) openEpisode(1); else showMenu();
+})();
+</script>
+</body>
+</html>

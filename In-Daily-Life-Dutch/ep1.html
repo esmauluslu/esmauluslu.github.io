@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Episode 2: My first Dutch supermarket</title>
+<link rel="stylesheet" href="shared/reel.css">
+<style>
+/* Episode 1: subtitles sit below the price tags so the labels stay readable */
+#subs { top: 12%; left: 45%; width: 76%; transition: top .2s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><span class="proto">Dutch for Daily Life · Supermarkt · Episode 2</span></div>
+
+  <div class="reel" id="reel">
+    <svg class="scene" id="scene" viewBox="0 0 360 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Point-of-view walk through the supermarket">
+      <defs>
+        <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F2EA"/><stop offset="1" stop-color="#E4DCCB"/></linearGradient>
+        <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFC8B8"/><stop offset="1" stop-color="#A9A291"/></linearGradient>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFE3F2"/><stop offset="1" stop-color="#EAF6FB"/></linearGradient>
+        <filter id="soft" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.4"/></filter>
+      </defs>
+      <g id="world"></g>
+    </svg>
+
+    <div class="hud" id="hud">
+      
+      <div class="who-row"><span class="avatar" aria-hidden="true">SD</span><span>Simply Dutch Market <small>· Supermarkt</small></span></div>
+    </div>
+    <div class="labels" id="labels" aria-hidden="true"></div>
+    <div class="acts" id="acts" hidden></div>
+    <div class="clock" id="clock" hidden aria-live="polite">⏱ <b id="mins">0</b> min</div>
+    <div class="bagtoast" id="bagtoast" hidden></div>
+    <div class="subs" id="subs" aria-live="polite"></div>
+    <div class="tapflash" id="tapflash" hidden>❚❚</div>
+    <div class="hint" id="hint" hidden>Tap the video to pause</div>
+    <div class="rail" id="rail" hidden>
+      <label><button type="button" id="ccBtn" aria-label="Subtitles: English">CC</button><span id="ccLabel">On</span></label>
+      <label><button type="button" id="sndBtn" aria-label="Background sound">♪</button><span id="sndLabel">On</span></label>
+    </div>
+    <div class="sheet" id="sheet" hidden aria-live="polite"></div>
+  </div>
+
+  <div class="notes"><span>Illustrated version of the vertical point-of-view video.</span></div>
+</div>
+
+<script src="shared/bridge.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const B = window.Bridge;                       // course shell + SCORM bridge (see shared/bridge.js)
+  let charName = B.getChar() || '';
+  let paused = false, running = false, cc = 1;    // 1 = subtitles on, 0 = off
+  let sceneIndex = 0;
+
+  /* ---------- tiny drawing kit (SVG strings) ---------- */
+  const shelf = (inner, label) => `
+    <rect x="0" y="0" width="360" height="640" fill="url(#wallG)"/>
+    <rect x="0" y="520" width="360" height="120" fill="url(#floorG)"/>
+    <rect x="18" y="70" width="324" height="470" rx="6" fill="#D8CFBD"/>
+    <rect x="30" y="82" width="300" height="446" fill="#EFE9DD"/>
+    <rect x="18" y="200" width="324" height="12" fill="#B9AE98"/>
+    <rect x="18" y="352" width="324" height="12" fill="#B9AE98"/>
+    <rect x="18" y="500" width="324" height="12" fill="#B9AE98"/>
+    ${inner}
+    ${label || ''}`;
+  // Rahul has his own pictures (a man's hand on the basket) wherever the basket is visible
+  const RAHUL_IMG = ['cashier', 'zelfscan', 'choice', 'queue', 'sanne_listen', 'sanne_point', 'inside', 'milk', 'oranges', 'cheese', 'bread'];
+  const imgPath = name => (charName === 'Rahul' && RAHUL_IMG.includes(name)) ? `img/rahul/${name}.jpg` : `img/${name}.jpg`;
+  const photo = name => `<image href="${imgPath(name)}" x="0" y="0" width="360" height="640" preserveAspectRatio="xMidYMid slice"/>`;
+  const priceTag = (x, y, price, unit) => `
+    <g><rect x="${x}" y="${y}" width="104" height="44" rx="4" fill="#FFFFFF" stroke="#C9C1B0"/>
+    <text x="${x + 52}" y="${y + 22}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="17" fill="#1D1F1E">${price}</text>
+    <text x="${x + 52}" y="${y + 38}" text-anchor="middle" font-family="Quicksand, sans-serif" font-weight="700" font-size="11" fill="#55635A">${unit}</text></g>`;
+  const offerTag = (x, y, top, bottom) => `
+    <g><rect x="${x}" y="${y}" width="132" height="58" rx="6" fill="#F6E7B4" stroke="#D9B648" stroke-width="2"/>
+    <text x="${x + 66}" y="${y + 26}" text-anchor="middle" font-family="Quicksand, sans-serif" font-weight="700" font-size="18" fill="#3A2600">${top}</text>
+    <text x="${x + 66}" y="${y + 46}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" fill="#3A2600">${bottom}</text></g>`;
+  const apple = (x, y, c) => `<g><circle cx="${x}" cy="${y}" r="17" fill="${c || '#C0392B'}"/><path d="M${x} ${y - 16} l2 -9" stroke="#5A3A1A" stroke-width="3"/><ellipse cx="${x + 6}" cy="${y - 20}" rx="6" ry="3" fill="#6BAA75"/><circle cx="${x - 6}" cy="${y - 5}" r="4" fill="#FFFFFF" opacity=".25"/></g>`;
+  const orange = (x, y, c) => `<g><circle cx="${x}" cy="${y}" r="17" fill="${c || '#F39C12'}"/><circle cx="${x - 5}" cy="${y + 4}" r="1.2" fill="#D9800B"/><circle cx="${x + 6}" cy="${y + 6}" r="1.2" fill="#D9800B"/><circle cx="${x + 2}" cy="${y - 4}" r="1.2" fill="#D9800B"/><circle cx="${x}" cy="${y - 15}" r="2.5" fill="#7A5A2A"/><ellipse cx="${x + 7}" cy="${y - 18}" rx="7" ry="3.5" fill="#5E9E5A" transform="rotate(-20 ${x + 7} ${y - 18})"/><circle cx="${x - 6}" cy="${y - 6}" r="4" fill="#FFFFFF" opacity=".3"/></g>`;
+  const cheese = (x, y) => `<g><path d="M${x - 40} ${y} L${x + 40} ${y} L${x + 30} ${y - 46} Z" fill="#F5D76E" stroke="#D9B648" stroke-width="2"/><circle cx="${x + 8}" cy="${y - 14}" r="5" fill="#E3C35A"/><circle cx="${x + 22}" cy="${y - 30}" r="3" fill="#E3C35A"/></g>`;
+  const bread = (x, y) => `<g><path d="M${x - 44} ${y} q0 -50 44 -50 q44 0 44 50 z" fill="#C98B5B"/><path d="M${x - 22} ${y - 30} l10 -12 M${x} ${y - 34} l10 -12 M${x + 22} ${y - 30} l10 -12" stroke="#A86D41" stroke-width="3"/></g>`;
+  const milk = (x, y) => `<g><rect x="${x - 20}" y="${y - 70}" width="40" height="70" rx="3" fill="#FFFFFF" stroke="#C7CFCA"/><path d="M${x - 20} ${y - 70} l20 -16 l20 16z" fill="#EEF1EF" stroke="#C7CFCA"/><rect x="${x - 14}" y="${y - 48}" width="28" height="16" fill="#5B8DD9"/><text x="${x}" y="${y - 14}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#2C3E66">MELK</text></g>`;
+  const person = (x, y, s, hair, shirt, pointing) => `
+    <g transform="translate(${x} ${y}) scale(${s})">
+      <path d="M-70 120 C-66 40 -36 10 0 10 C36 10 66 40 70 120 Z" fill="${shirt}"/>
+      ${pointing ? '<path d="M-40 40 L-120 -10" stroke="' + shirt + '" stroke-width="22" stroke-linecap="round"/><circle cx="-124" cy="-12" r="12" fill="#F2CDB0"/>' : ''}
+      <rect x="-12" y="-20" width="24" height="34" rx="8" fill="#E0B394"/>
+      <ellipse cx="0" cy="-58" rx="38" ry="44" fill="#F4D2B8"/>
+      <path d="M-40 -66 C-42 -104 -12 -110 2 -110 C30 -110 44 -96 40 -66 C30 -84 14 -88 0 -88 C-16 -88 -32 -82 -40 -66 Z" fill="${hair}"/>
+      <circle cx="26" cy="-106" r="13" fill="${hair}"/>
+      <circle cx="-13" cy="-58" r="3.6" fill="#1D1F1E"/><circle cx="13" cy="-58" r="3.6" fill="#1D1F1E"/>
+      <path class="mouth" d="M-11 -34 Q0 -26 11 -34" stroke="#8E4A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="20" y="52" width="38" height="14" rx="3" fill="#FFFFFF"/><text x="39" y="62" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#1D1F1E">SANNE</text>
+    </g>`;
+
+  /* ---------- the shop: places the learner walks to (storyboard: Video 1, now interactive) ---------- */
+  const BASKET = { inside: { front: 548, x0: 80, x1: 325 }, std: { front: 550, x0: 70, x1: 320 }, milk: { front: 588, x0: 75, x1: 320 } };
+  const BASKET_RAHUL = { inside: { front: 556, x0: 80, x1: 330 }, std: { front: 560, x0: 70, x1: 330 }, milk: { front: 600, x0: 60, x1: 330 } };
+  const basketOf = pl => pl.basket ? (charName === 'Rahul' ? BASKET_RAHUL : BASKET)[pl.basket] : null;
+  // tags: [left %, top %, kind, line 1, line 2, English]
+  const PLACES = {
+    storefront: { img: 'storefront', labels: [['de ingang', 40, 27]] },
+    inside: { img: 'inside', basket: 'inside', labels: [['het mandje', 58, 72]] },
+    sinaasappel: { img: 'oranges', basket: 'std', tags: [[56, 23, 'price', '€ 2,49', 'per kilo', '€2.49 per kilo']], labels: [['de sinaasappels', 4, 24]], think: 'Sinaasappels… per kilo. Okay, that one I can guess.', vo: 2, walk: 3 },
+    kaas: { img: 'cheese', basket: 'std', tags: [[40, 21, 'offer', 'Aanbieding', '2e halve prijs', 'Special offer: the 2nd one is half price']], labels: [['de kaas', 4, 22]], think: 'Halve… half? Half price on the second one! Two cheeses, then.', vo: 3, walk: 4 },
+    brood: { img: 'bread', basket: 'std', tags: [[58, 23, 'price', '€ 2,19', 'per stuk', '€2.19 per piece']], labels: [['het brood', 4, 23]], think: 'Brood. Bread. That was easy.', vo: 4, walk: 3 },
+    search: { img: 'aisle', labels: [['de melk?', 36, 24]] },
+    sanne: { img: 'sanne_listen', basket: 'std', labels: [] },
+    sannePoint: { img: 'sanne_point', basket: 'std', labels: [['achterin', 4, 19], ['links', 36, 19]] },
+    melk: { img: 'milk', basket: 'milk', tags: [[50, 27, 'price', '€ 1,15', 'melk · 1 liter', '€1.15 · milk, 1 litre']], labels: [['de melk', 4, 22], ['achterin', 62, 19], ['links', 4, 30]], think: 'Achterin: at the back. Links: left. And there it is!', vo: 6 },
+    choice: { img: 'choice', basket: 'std', labels: [['de zelfscan', 4, 26], ['de kassa', 62, 26]] },
+    queue: { img: 'queue', basket: 'std', labels: [['de kassa', 56, 24], ['de rij', 6, 30]] },
+    cashier: { img: 'cashier', labels: [['de caissière', 60, 21], ['de pinautomaat', 2, 41]] },
+    zelfscan: { img: 'zelfscan', basket: 'std', labels: [['scannen', 4, 25], ['betalen', 4, 31], ['de zelfscan', 60, 20]] }
+  };
+
+  /* ---------- audio: recorded files when they exist; otherwise the subtitle carries the line ---------- */
+  const AUDIO = {
+    'sanne:Hoi! Kan ik je helpen?': () => 'audio/sdm_e01_sanne_01.mp3',
+    'sanne:De melk? Daar, achterin. Links.': () => 'audio/sdm_e01_sanne_02.mp3',
+    'you:Sorry, waar is de melk?': c => `audio/sdm_e01_${c}_say_01.mp3`,
+    'you:Bedankt!': c => `audio/sdm_e01_${c}_say_02.mp3`,
+    'you:Ja, graag!': c => `audio/sdm_e01_${c}_say_03.mp3`,
+    'you:Nee, dank je.': c => `audio/sdm_e01_${c}_say_04.mp3`,
+    'kassa:Wil je de bon?': () => 'audio/sdm_e01_kassa_01.mp3',
+    'kassa:Alsjeblieft. Fijne dag!': () => 'audio/sdm_e01_kassa_02.mp3',
+    'kassa:Oké. Fijne dag!': () => 'audio/sdm_e01_kassa_03.mp3'
+  };
+  let currentAudio = null, currentDone = null;
+  function stopAudio() {
+    try { if (currentAudio) currentAudio.pause(); } catch (e) {}
+    if (currentDone) { const d = currentDone; currentDone = null; d(); }
+  }
+  function play(key, text, voIndex) {
+    const who = charName.toLowerCase();
+    const src = AUDIO[key] ? AUDIO[key](who) : (voIndex ? `audio/sdm_e03_${who}_vo_${String(voIndex).padStart(2, '0')}.mp3` : null);
+    const fallback = () => sleep(900 + text.length * 55);
+    if (!src) return fallback();
+    return new Promise(res => { const resolve = () => { SND.duck(false); res(); };
+      stopAudio();
+      const a = new Audio(src);
+      currentAudio = a; currentDone = resolve;
+      a.onplaying = () => SND.duck(true);
+      a.onended = () => { currentDone = null; resolve(); };
+      a.onerror = () => { currentDone = null; fallback().then(resolve); };
+      const p = a.play(); if (p && p.catch) p.catch(() => { currentDone = null; fallback().then(resolve); });
+    });
+  }
+
+  /* ---------- background sound (recorded loops) + small effects (made in the browser) ---------- */
+  const SND = (function () {
+    let on = true, ctx = null, cur = null, curName = '', duck = false;
+    const VOL = 0.32, DUCK = 0.1;
+    const ac = () => { try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch (e) { ctx = null; } return ctx; };
+    function fade(a, to, ms, done) {
+      const from = a.volume, t0 = performance.now();
+      const step = t => { const k = Math.min(1, (t - t0) / ms); a.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k < 1) requestAnimationFrame(step); else if (done) done(); };
+      requestAnimationFrame(step);
+    }
+    function amb(name) {
+      if (name === curName) return;
+      curName = name;
+      if (cur) { const old = cur; fade(old, 0, 900, () => old.pause()); cur = null; }
+      if (!name || !on) return;
+      const a = new Audio(`audio/amb_${name}.mp3`); a.loop = true; a.volume = 0;
+      a.onerror = () => {};                           // not recorded yet: stay quiet
+      const p = a.play(); if (p && p.catch) p.catch(() => {});
+      cur = a; fade(a, duck ? DUCK : VOL, 1200);
+    }
+    function setDuck(d) { duck = d; if (cur) fade(cur, d ? DUCK : VOL, 300); }
+    function tone(freq, dur, type = 'sine', vol = 0.15, at = 0, slide) {
+      const c = ac(); if (!c || !on) return;
+      const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + at;
+      o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.05);
+    }
+    function noise(dur, vol = 0.05, at = 0, hp = 1500) {
+      const c = ac(); if (!c || !on) return;
+      const b = c.createBuffer(1, c.sampleRate * dur, c.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.sin(i / 90));
+      const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + at;
+      f.type = 'highpass'; f.frequency.value = hp; g.gain.value = vol;
+      src.buffer = b; src.connect(f); f.connect(g); g.connect(c.destination); src.start(t);
+    }
+    const fx = {
+      door: () => { noise(0.9, 0.035, 0, 600); tone(988, 0.5, 'sine', 0.12, 0.25); tone(784, 0.7, 'sine', 0.12, 0.55); },
+      drop: () => { tone(520, 0.18, 'sine', 0.18, 0.55, 260); tone(180, 0.12, 'triangle', 0.12, 0.62); },
+      beep: (n = 1) => { for (let i = 0; i < n; i++) tone(1850, 0.09, 'square', 0.05, i * 0.75); },
+      print: () => noise(1.1, 0.04, 0, 2500),
+      tap: () => tone(660, 0.06, 'sine', 0.06),
+      prompt: () => { tone(1046, 0.16, 'sine', 0.13); tone(1318, 0.16, 'sine', 0.13, 0.16); tone(1568, 0.3, 'sine', 0.13, 0.32); },
+      tick: () => tone(1200, 0.05, 'triangle', 0.05)
+    };
+    function toggle() { on = !on; if (!on && cur) { cur.pause(); cur = null; } const n = curName; curName = ''; if (on) amb(n); else curName = n; return on; }
+    return { amb, duck: setDuck, fx, toggle, unlock: ac };
+  })();
+
+  /* ---------- helpers ---------- */
+  function gate() { return new Promise(res => { const c = () => paused ? setTimeout(c, 150) : res(); c(); }); }
+  function subs(html) { $('subs').innerHTML = cc ? html : ''; }
+  function buildSegs(n) { $('segs').innerHTML = '<span class="seg"><i></i></span>'.repeat(n); }
+  function setProgress(k) { Array.from($('segs').children).forEach((s, i) => s.classList.toggle('done', i < k)); }
+  /* word labels on the scene: tap one to see the English */
+  const EN = { 'de ingang': 'the entrance', 'het mandje': 'the basket', 'de sinaasappels': 'the oranges', 'per kilo': 'price per kilo', 'de kaas': 'the cheese', '2e halve prijs': '2nd one half price', 'het brood': 'the bread', 'per stuk': 'price per piece', 'de melk': 'the milk', 'achterin': 'at the back', 'links': 'left', 'de kassa': 'the checkout', 'de melk?': 'the milk?', 'de zelfscan': 'the self-checkout', 'de rij': 'the queue', 'de caissière': 'the cashier', 'de pinautomaat': 'the card machine', 'scannen': 'to scan', 'betalen': 'to pay' };
+  let tapHintShown = false;
+  function showLabels(list, tags = []) {
+    $('labels').innerHTML = tags.map(([l, t, kind, a, b, en]) => `<button type="button" class="tag ${kind}" style="left:${l}%;top:${t}%"><b lang="nl">${a}</b><span lang="nl">${b}</span><small class="lab-en">${en}</small></button>`).join('') + list.map(([t, l, top], i) => `<button type="button" class="label" style="left:${l}%;top:${top}%;animation-delay:${0.35 + i * 0.35}s" aria-label="${t}: tap for English"><span lang="nl">${t}</span>${EN[t] ? `<small class="lab-en">${EN[t]}</small>` : ''}</button>`).join('');
+    $('labels').querySelectorAll('.label, .tag').forEach(b => b.onclick = e => { e.stopPropagation(); b.classList.toggle('open'); B.interaction('ep1_label_en', b.textContent); });
+    if (list.length && !tapHintShown) { tapHintShown = true; const h = $('hint'); h.textContent = 'Tap a word to see it in English'; h.hidden = false; setTimeout(() => { h.hidden = true; }, 3200); }
+  }
+  let bag = [], justAdded = null;
+  const SLOTS = [[-50, 0], [6, -2], [-24, -24], [36, -24]];
+  function basketLayer(b) {
+    if (!b || !bag.length) return '';
+    const size = 58, cx = (b.x0 + b.x1) / 2 + 6;
+    const items = bag.map((id, i) => ({ id, dx: SLOTS[i][0], dy: SLOTS[i][1], r: [-8, 6, -3, 9][i] }));
+    items.sort((a, c) => a.dy - c.dy);           // back row first, front row on top
+    return items.map(it => {
+      const x = cx + it.dx - size / 2 + 8, y = b.front - size + 6 + it.dy;
+      return `<g class="${it.id === justAdded ? 'drop' : ''}"><image href="img/badge_${it.id}.png" x="${x}" y="${y}" width="${size}" height="${size}" transform="rotate(${it.r} ${x + size / 2} ${y + size / 2})"/></g>`;
+    }).join('');
+  }
+  function renderPlace(key, walk = true) {
+    const pl = PLACES[key], w = $('world');
+    const bk = basketOf(pl);
+    const front = bk ? `<defs><clipPath id="basketFront"><rect x="0" y="${bk.front}" width="360" height="${640 - bk.front}"/></clipPath></defs><image href="${imgPath(pl.img)}" x="0" y="0" width="360" height="640" preserveAspectRatio="xMidYMid slice" clip-path="url(#basketFront)"/>` : '';
+    w.innerHTML = photo(pl.img) + basketLayer(bk) + front;
+    if (walk) { w.classList.remove('walk'); void w.getBBox(); w.classList.add('walk'); }
+    showLabels(pl.labels || [], pl.tags || []);
+    current = key;
+  }
+  let current = 'storefront';
+  const PICK_NAMES = { sinaasappel: 'de sinaasappels', kaas: 'de kaas', brood: 'het brood', melk: 'de melk' };
+  function addToBasket(id) {
+    bag.push(id); justAdded = id; SND.fx.drop(); renderPlace(current, false); justAdded = null;
+    const t = $('bagtoast'); t.textContent = '+ ' + PICK_NAMES[id]; t.hidden = false;
+    t.classList.remove('go'); void t.offsetWidth; t.classList.add('go');
+    setTimeout(() => { t.hidden = true; }, 1800);
+  }
+
+  /* clock: every walk, search and question costs minutes */
+  let minutes = 0;
+  function addMinutes(n) {
+    const target = minutes + n, el = $('mins'), c = $('clock');
+    c.classList.remove('tick'); void c.offsetWidth; c.classList.add('tick'); SND.fx.tick();
+    const step = () => { if (minutes < target) { minutes++; el.textContent = minutes; setTimeout(step, 90); } };
+    step();
+  }
+  function caption(kind, html, top) {
+    const el = $('subs');
+    el.className = 'subs ' + kind;
+    if (kind === 'think') { el.style.top = 'auto'; el.style.bottom = (top || 48) + '%'; }
+    else { el.style.bottom = 'auto'; el.style.top = (top || 27) + '%'; }
+    subs(html);
+    el.querySelectorAll('.tapnl').forEach(x => x.onclick = () => x.classList.toggle('open'));
+  }
+  const THINK = [
+    ['Okay. Guests at seven. I can do this.', "Right. Guests at seven. Let's try it in Dutch."],
+    ["Four things on my list. Let's go in."],
+    ['Okay. A basket… and my list.'],
+    ['Sinaasappels… per kilo. Okay, that one I can guess.'],
+    ['Halve… half? Half price on the second one! Two cheeses, then.'],
+    ['Brood. Bread. That was easy.'],
+    ['Melk… where is the milk?'],
+    ['Not here… not here either. Eight minutes gone.'],
+    ['Still no milk. Another eight minutes. I really should ask.'],
+    ['Achterin: at the back. Links: left. And there it is!'],
+    ['Zelfscan or kassa? Which one do I take?'],
+    ['A queue. Okay… I wait my turn.'],
+    ['Four things in my basket. Now she scans everything…'],
+    ['Scan, betaal, ga verder. Scan, pay, go.']
+  ];
+  THINK.forEach((lines, i) => lines.forEach(t => { AUDIO['think:' + t] = c => `audio/sdm_e01_${c}_think_${String(i + 1).padStart(2, '0')}.mp3`; }));
+  function think(text, vo, bottom) { caption('think', `<span class="bubble"><small>${charName} is thinking…</small>${text}</span>`, bottom); return play('think:' + text, text); }
+  /* a spoken line: caption + recorded voice (silent until the file exists) */
+  function talk(voice, who, nl, en) { dialog(who, nl, en); return play(`${voice}:${nl}`, nl); }
+  function dialog(who, nl, en) { caption('dlg', `<span class="who">${who}</span><button type="button" class="tapnl"><span class="nl" lang="nl">${nl}</span><span class="en">${en}</span><small class="tapme">tap for English</small></button>`); }
+  /* one or more action buttons on the scene; resolves with the chosen key */
+  function act(buttons) {
+    return new Promise(res => {
+      $('acts').innerHTML = buttons.map(b => `<button type="button" class="actbtn${b.ghost ? ' ghost-act' : ''}" data-k="${b.k}"><span lang="nl">${b.nl}</span>${b.en ? `<small>${b.en}</small>` : ''}</button>`).join('');
+      $('acts').hidden = false;
+      $('acts').querySelectorAll('button').forEach(x => x.onclick = () => { SND.fx.tap(); stopAudio(); $('acts').hidden = true; $('acts').innerHTML = ''; res(x.dataset.k); });
+    });
+  }
+
+  /* ---------- sheet screens (Ekran 01, 02, closing card) ---------- */
+  function sheet(html) { const s = $('sheet'); s.hidden = false; s.innerHTML = '<span class="grab"></span>' + html; return s; }
+  function hideSheet() { $('sheet').hidden = true; }
+
+  function welcome() {
+    renderPlace('storefront', false); $('labels').innerHTML = ''; $('hint').hidden = true; tapHintShown = false;
+    sheet(`<span class="ask">Supermarkt · Episode 2 of 4</span>
+      <h1 class="title">Your first Dutch supermarket trip</h1>
+      <p class="body">By the end of this module, you can do your shopping in Dutch: find what you need, read the labels and pay at the checkout.</p>
+      <p class="body muted">You shop 2–3 times a week. Every trip is free Dutch practice.</p>
+      <p class="meta">About 20 minutes · 4 short episodes</p>
+      <button class="go" id="startBtn" type="button">Start</button>
+      <button class="ghost" id="knowBtn" type="button">I already know some Dutch</button>`);
+    $('startBtn').onclick = () => confidence(false);
+    $('knowBtn').onclick = () => confidence(true);
+  }
+
+  function confidence(thenCheck) {
+    const next = () => thenCheck ? quickCheck() : learnWords(WORDS, 'all');
+    if (B.getData('conf0')) { next(); return; }
+    sheet(`<span class="ask">Before we start</span>
+      <h2 class="title">How confident do you feel about shopping in Dutch?</h2>
+      <div class="scale" role="group" aria-label="Confidence from 1 to 5">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="dot" data-v="${n}">${n}</button>`).join('')}</div>
+      <div class="scale-ends"><span>Not at all</span><span>Very</span></div>`);
+    document.querySelectorAll('.scale .dot').forEach(b => b.onclick = () => {
+      B.setData('conf0', Number(b.dataset.v));
+      next();
+    });
+  }
+
+  /* ---------- the four things on today's shopping list (same words the video labels later) ---------- */
+  const ICONS = Object.fromEntries(['sinaasappel', 'kaas', 'brood', 'melk'].map(id => [id, `<img src="img/badge_${id}.png" alt="">`]));
+  const WORDS = [
+    { id: 'sinaasappel', art: 'de', word: 'sinaasappel', en: 'orange', tip: 'Fun fact: <b>sinaas</b> comes from China, so a <b>sinaasappel</b> is a "Chinese apple". More than one? <b>sinaasappels</b>.' },
+    { id: 'kaas', art: 'de', word: 'kaas', en: 'cheese', tip: 'Gouda, Edam… The Dutch are famous for <b>kaas</b>.' },
+    { id: 'brood', art: 'het', word: 'brood', en: 'bread', tip: 'Sounds a bit like English "bread", right?' },
+    { id: 'melk', art: 'de', word: 'melk', en: 'milk', tip: 'Melk, milk. Look for it in the <b>zuivel</b> (dairy) aisle.' }
+  ];
+  const wordAudio = w => `audio/sdm_e01_word_${w.id}.mp3`;
+  function say(w, btn) {
+    const a = new Audio(wordAudio(w));
+    a.onerror = () => { if (btn) btn.hidden = true; };   // not recorded yet: hide the speaker, the text still teaches
+    const p = a.play(); if (p && p.catch) p.catch(() => {});
+  }
+  const shuffle = arr => arr.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(x => x[1]);
+  const steps = (k, n) => `<div class="steps" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i class="${i < k ? 'on' : ''}"></i>`).join('')}</div>`;
+  function tallSheet(html) { const s = sheet(html); s.classList.add('tall'); return s; }
+  function normalSheet() { $('sheet').classList.remove('tall'); }
+
+  /* Start → learn: one picture card per word, then a tap-the-picture game (beginners) */
+  function learnWords(list, placement, intro) {
+    B.setData('placement', placement);
+    let i = 0;
+    const total = list.length * 2;
+    const card = () => {
+      const w = list[i];
+      tallSheet(`${steps(i + 1, total)}
+        <span class="ask">${intro || 'Your shopping list'} · new word ${i + 1} of ${list.length}</span>
+        <div class="wordcard">${ICONS[w.id]}
+          <span class="nlword" lang="nl"><span class="art">${w.art}</span> ${w.word}</span>
+          <span class="enword">${w.en}</span>
+          <button class="speak" type="button" id="speakBtn" aria-label="Listen: ${w.art} ${w.word}">🔊 Listen</button>
+        </div>
+        <p class="tip">${w.tip}</p>
+        <button class="go" id="gotBtn" type="button">Got it</button>`);
+      $('speakBtn').onclick = () => say(w, $('speakBtn'));
+      say(w, $('speakBtn'));
+      $('gotBtn').onclick = () => { i++; i < list.length ? card() : practise(); };
+    };
+    const practise = () => {
+      let k = 0;
+      const order = shuffle(list);
+      const ask = () => {
+        const w = order[k];
+        const pool = list.length >= 4 ? list : WORDS;
+        const opts = shuffle([w, ...shuffle(pool.filter(x => x.id !== w.id)).slice(0, 3)]);
+        tallSheet(`${steps(list.length + k + 1, total)}
+          <span class="ask">Practice · ${k + 1} of ${order.length}</span>
+          <h2 class="title">Tap the picture: <span lang="nl">${w.art} ${w.word}</span></h2>
+          <div class="tiles">${opts.map(o => `<button type="button" class="tile" data-id="${o.id}">${ICONS[o.id]}</button>`).join('')}</div>
+          <div class="feedback" id="fb" hidden></div>
+          <button class="go" id="contBtn" type="button" hidden>Continue</button>`);
+        let firstTry = true;
+        document.querySelectorAll('.tile').forEach(t => t.onclick = () => {
+          if (t.dataset.id === w.id) {
+            t.classList.add('right');
+            document.querySelectorAll('.tile').forEach(x => x.disabled = true);
+            t.insertAdjacentHTML('beforeend', `<span class="cap" lang="nl">${w.art} ${w.word}</span>`);
+            $('fb').className = 'feedback ok'; $('fb').hidden = false;
+            $('fb').innerHTML = `<b>${firstTry ? 'Goed zo!' : 'Ja, dat klopt!'}</b><span>${firstTry ? 'Well done!' : "That's right!"}</span>`;
+            B.interaction(`ep1_learn_${w.id}`, firstTry ? 'first-try' : 'second-try');
+            say(w);
+            $('contBtn').hidden = false; $('contBtn').focus();
+          } else {
+            firstTry = false;
+            t.classList.add('wrong'); t.disabled = true;
+            $('fb').className = 'feedback no'; $('fb').hidden = false;
+            $('fb').innerHTML = `<b>Bijna!</b><span>Almost. Try again.</span>`;
+          }
+        });
+        $('contBtn').onclick = () => { k++; k < order.length ? ask() : wellDone(); };
+      };
+      ask();
+    };
+    const wellDone = () => {
+      tallSheet(`<span class="ask">Your shopping list</span>
+        <h2 class="title">You know your shopping list in Dutch!</h2>
+        <div class="tiles">${WORDS.map(w => `<div class="tile">${ICONS[w.id]}<span class="cap" lang="nl">${w.art} ${w.word}</span></div>`).join('')}</div>
+        <p class="body muted">Look for these words in the shop. Next: choose who you are.</p>
+        <button class="go" id="okBtn" type="button">Continue</button>`);
+      $('okBtn').onclick = pickCharacter;
+    };
+    card();
+  }
+
+  /* "I already know some Dutch" → a picture check on the same four words; missed words are taught, known ones skipped */
+  function quickCheck() {
+    let i = 0;
+    const order = shuffle(WORDS), missed = [];
+    const ask = () => {
+      const w = order[i];
+      const opts = shuffle([w, ...shuffle(WORDS.filter(x => x.id !== w.id)).slice(0, 2)]);
+      tallSheet(`${steps(i + 1, order.length)}
+        <span class="ask">Quick check · ${i + 1} of ${order.length}</span>
+        <h2 class="title">What is this in Dutch?</h2>
+        <div class="picq">${ICONS[w.id]}</div>
+        <div class="answers">${opts.map(o => `<button type="button" class="answer simple" data-id="${o.id}"><span class="nl" lang="nl">${o.art} ${o.word}</span></button>`).join('')}</div>
+        <div class="feedback" id="fb" hidden></div>
+        <button class="go" id="contBtn" type="button" hidden>Continue</button>`);
+      document.querySelectorAll('.answer.simple').forEach(b => b.onclick = () => {
+        const ok = b.dataset.id === w.id;
+        if (!ok) missed.push(w);
+        B.interaction(`ep1_check_${w.id}`, b.textContent.trim());
+        document.querySelectorAll('.answer.simple').forEach(x => {
+          x.disabled = true; x.classList.add('locked');
+          if (x.dataset.id === w.id) x.classList.add('right');
+        });
+        if (!ok) b.classList.add('wrong');
+        $('fb').className = 'feedback ' + (ok ? 'ok' : 'no'); $('fb').hidden = false;
+        $('fb').innerHTML = ok ? `<b>Goed zo!</b><span>Correct: ${w.art} ${w.word} = ${w.en}</span>` : `<b>Niet helemaal.</b><span>Not quite. It's <b lang="nl">${w.art} ${w.word}</b> (${w.en}).</span>`;
+        say(w);
+        $('contBtn').hidden = false; $('contBtn').focus();
+      });
+      $('contBtn').onclick = () => { i++; i < order.length ? ask() : done(); };
+    };
+    const done = () => {
+      normalSheet();
+      const right = WORDS.length - missed.length;
+      if (!missed.length) {
+        B.setData('placement', 'skip-words');
+        sheet(`<span class="ask">Quick check</span>
+          <h2 class="title">${right} of ${WORDS.length}. Perfect!</h2>
+          <p class="body">You already know your shopping list, so we skip the word cards.</p>
+          <button class="go" id="okBtn" type="button">Continue</button>`);
+        $('okBtn').onclick = pickCharacter;
+        return;
+      }
+      sheet(`<span class="ask">Quick check</span>
+        <h2 class="title">${right} of ${WORDS.length} correct</h2>
+        <p class="body">Nice start! Let's quickly learn the ${missed.length === 1 ? 'word' : missed.length + ' words'} you missed.</p>
+        <div class="chips">${missed.map(w => `<span class="wchip" lang="nl">${w.art} ${w.word}</span>`).join('')}</div>
+        <button class="go" id="okBtn" type="button">Learn ${missed.length === 1 ? 'it' : 'them'}</button>
+        <button class="ghost" id="skipBtn" type="button">Skip to the video</button>`);
+      $('okBtn').onclick = () => learnWords(missed, 'some-words', 'Words to learn');
+      $('skipBtn').onclick = () => { B.setData('placement', 'some-words'); pickCharacter(); };
+    };
+    ask();
+  }
+
+  function pickCharacter() {
+    normalSheet();
+    if (charName) { startVideo(); return; }
+    sheet(`<span class="ask">Episode 2</span>
+      <h2 class="title">Who are you shopping as?</h2>
+      <p class="body muted">Choose your character. You will hear their voice in every episode. You can change this later.</p>
+      <div class="persons">
+        <button class="person" type="button" data-char="Mira">${B.portrait('Mira')}<strong>Mira, 31</strong><span>Moved to Utrecht 3 weeks ago. Dreads being asked a question at the checkout.</span></button>
+        <button class="person" type="button" data-char="Rahul">${B.portrait('Rahul')}<strong>Rahul, 28</strong><span>Moved to Eindhoven 2 weeks ago. Wants to try Dutch outside work.</span></button>
+      </div>`);
+    document.querySelectorAll('.person').forEach(b => b.onclick = async () => {
+      charName = b.dataset.char;
+      B.setChar(charName);
+      hideSheet();
+      think(charName === 'Mira' ? 'Okay. Guests at seven. I can do this.' : "Right. Guests at seven. Let's try it in Dutch.", 0);
+      await sleep(2600);
+      startVideo();
+    });
+  }
+
+  /* ---------- Video 1, interactive: walk in, use the list, ask when you are lost ---------- */
+  const LIST = [
+    { id: 'sinaasappel', nl: 'de sinaasappels', en: 'oranges' },
+    { id: 'kaas', nl: 'de kaas', en: 'cheese' },
+    { id: 'brood', nl: 'het brood', en: 'bread' },
+    { id: 'melk', nl: 'de melk', en: 'milk' }
+  ];
+  let searched = 0, askedAfter = 0, order = [];
+  async function startVideo() {
+    hideSheet();
+    bag = []; minutes = 0; searched = 0; order = []; $('mins').textContent = '0';
+    $('rail').hidden = false; $('clock').hidden = false;
+    SND.unlock(); SND.amb('street');
+    renderPlace('storefront');
+    await think("Four things on my list. Let's go in.", 1);
+    await act([{ k: 'in', nl: 'Ga naar binnen ▸', en: 'Go inside' }]);
+    $('subs').innerHTML = '';
+    SND.fx.door(); SND.amb('store');
+    renderPlace('inside');
+    await think('Okay. A basket… and my list.', 0);
+    await act([{ k: 'list', nl: 'Bekijk je lijstje', en: 'Check your list' }]);
+    showList();
+  }
+
+  function showList() {
+    $('subs').innerHTML = ''; $('labels').innerHTML = '';
+    const left = LIST.filter(x => !bag.includes(x.id));
+    tallSheet(`<span class="ask">Mijn boodschappenlijstje · my shopping list</span>
+      <h2 class="title">${left.length ? 'What do you need next?' : 'Alles in je mandje!'}</h2>
+      ${left.length ? '<p class="body muted">Tap an item to go to its aisle.</p>' : '<p class="body muted">Everything is in your basket. Time to pay.</p>'}
+      <div class="slist">${LIST.map(x => {
+        const done = bag.includes(x.id);
+        return `<button type="button" class="srow${done ? ' done' : ''}" data-id="${x.id}" ${done ? 'disabled' : ''}><img src="img/badge_${x.id}.png" alt=""><span><b lang="nl">${x.nl}</b><small>${x.en}</small></span><i>${done ? '✓' : '›'}</i></button>`;
+      }).join('')}</div>
+      ${left.length ? '' : '<button class="go" id="kassaBtn" type="button">Naar de kassa ▸ <small>to the checkout</small></button>'}`);
+    document.querySelectorAll('.srow:not(.done)').forEach(r => r.onclick = () => { hideSheet(); normalSheet(); goTo(r.dataset.id); });
+    if (!left.length) $('kassaBtn').onclick = () => { hideSheet(); normalSheet(); checkout(); };
+  }
+
+  async function goTo(id) {
+    order.push(id);
+    if (id === 'melk') return milkHunt();
+    const pl = PLACES[id];
+    addMinutes(pl.walk);
+    renderPlace(id);
+    await think(pl.think, pl.vo);
+    await act([{ k: 'pick', nl: 'Doe in je mandje', en: 'Put it in your basket' }]);
+    addToBasket(id); B.interaction('ep1_pick_' + id, 'basket');
+    $('subs').innerHTML = '';
+    await sleep(1500);
+    showList();
+  }
+
+  async function milkHunt() {
+    addMinutes(2);
+    renderPlace('search');
+    await think('Melk… where is the milk?', 5);
+    for (;;) {
+      const k = await act([
+        { k: 'ask', nl: 'Vraag het aan een medewerker', en: 'Ask a staff member' },
+        { k: 'search', nl: 'Zelf zoeken', en: 'Look for it yourself', ghost: true }
+      ]);
+      if (k === 'ask') break;
+      searched++;
+      addMinutes(8);
+      renderPlace('search');
+      await think(searched === 1 ? 'Not here… not here either. Eight minutes gone.' : 'Still no milk. Another eight minutes. I really should ask.', 0);
+    }
+    B.interaction('ep1_milk_strategy', searched ? `searched ${searched}x, then asked` : 'asked right away');
+    renderPlace('sanne');
+    await talk('sanne', 'Sanne, staff', 'Hoi! Kan ik je helpen?', 'Hi! Can I help you?');
+    await act([{ k: 'q', nl: 'Sorry, waar is de melk?', en: 'Excuse me, where is the milk?' }]);
+    await talk('you', `${charName} (you)`, 'Sorry, waar is de melk?', 'Excuse me, where is the milk?');
+    addMinutes(1);
+    renderPlace('sannePoint', false);
+    await talk('sanne', 'Sanne, staff', 'De melk? Daar, achterin. Links.', 'The milk? Over there, at the back. Left.');
+    await act([{ k: 'go', nl: 'Bedankt! ▸', en: 'Thanks!' }]);
+    await talk('you', `${charName} (you)`, 'Bedankt!', 'Thanks!');
+    $('subs').innerHTML = '';
+    addMinutes(2);
+    renderPlace('melk');
+    await think(PLACES.melk.think, PLACES.melk.vo);
+    await act([{ k: 'pick', nl: 'Doe in je mandje', en: 'Put it in your basket' }]);
+    addToBasket('melk'); B.interaction('ep1_pick_melk', 'basket');
+    $('subs').innerHTML = '';
+    await sleep(1500);
+    showList();
+  }
+
+  async function checkout() {
+    addMinutes(2);
+    SND.amb('kassa');
+    renderPlace('choice');
+    await think('Zelfscan or kassa? Which one do I take?', 0);
+    const k = await act([
+      { k: 'kassa', nl: 'Naar de kassa', en: 'Checkout with a cashier' },
+      { k: 'zelfscan', nl: 'Naar de zelfscan', en: 'Self-checkout', ghost: true }
+    ]);
+    B.interaction('ep1_checkout_choice', k);
+    $('subs').innerHTML = '';
+    if (k === 'kassa') {
+      addMinutes(4);
+      renderPlace('queue');
+      await think('A queue. Okay… I wait my turn.', 0);
+      await act([{ k: 'turn', nl: 'Ik ben aan de beurt ▸', en: "It's my turn" }]);
+      $('subs').innerHTML = '';
+      renderPlace('cashier'); SND.fx.beep(4);
+      await think('Four things in my basket. Now she scans everything…', 7, 20);
+      $('subs').innerHTML = '';
+      await talk('kassa', 'de caissière', 'Wil je de bon?', 'Would you like the receipt?');
+    } else {
+      addMinutes(2);
+      renderPlace('zelfscan'); setTimeout(() => SND.fx.beep(4), 1500);
+      await think('Scan, betaal, ga verder. Scan, pay, go.', 7);
+      $('subs').innerHTML = '';
+      SND.fx.prompt(); dialog('de zelfscan', 'Wil je een bon?', 'Would you like a receipt?'); await sleep(900);
+    }
+    const bon = await act([
+      { k: 'ja', nl: 'Ja, graag!', en: 'Yes, please!' },
+      { k: 'nee', nl: 'Nee, dank je.', en: 'No, thank you.', ghost: true }
+    ]);
+    B.interaction('ep1_receipt', bon);
+    await talk('you', `${charName} (you)`, bon === 'ja' ? 'Ja, graag!' : 'Nee, dank je.', bon === 'ja' ? 'Yes, please!' : 'No, thank you.');
+    if (bon === 'ja') SND.fx.print();
+    if (k === 'kassa') { await talk('kassa', 'de caissière', bon === 'ja' ? 'Alsjeblieft. Fijne dag!' : 'Oké. Fijne dag!', bon === 'ja' ? 'Here you go. Have a nice day!' : 'Okay. Have a nice day!'); await sleep(500); }
+    $('subs').innerHTML = '';
+    closing(k, bon === 'ja');
+  }
+
+  const PATTERNS = [
+    ['Ga naar binnen.', 'Go inside.'],
+    ['Doe het in je mandje.', 'Put it in your basket.'],
+    ['Kan ik je helpen?', 'Can I help you?'],
+    ['Sorry, waar is de …?', 'Excuse me, where is the …?'],
+    ['Daar, achterin. Links.', 'Over there, at the back. Left.'],
+    ['Bedankt!', 'Thanks!'],
+    ['Wil je de bon? · Ja, graag! / Nee, dank je.', 'Would you like the receipt? · Yes, please! / No, thank you.']
+  ];
+  function closing(way, withBon = true) {
+    setTimeout(() => SND.amb(''), 4000);
+    B.episodeDone(2);
+    B.interaction('ep1_minutes', String(minutes));
+    $('subs').innerHTML = ''; $('labels').innerHTML = '';
+    const lesson = searched
+      ? `You searched for ${searched * 8} minutes before you asked. One short question in Dutch would have saved that time.`
+      : 'You asked Sanne straight away. One short question in Dutch saved you a lot of time.';
+    const lms = B.lms();
+    const saved = lms && lms.live
+      ? `<div class="saved ok">✓ Saved in Moodle · Episode 2 complete${lms.status === 'completed' ? ' · course completed' : ` · ${lms.done} of ${lms.total} episodes done`}</div>`
+      : '<div class="saved">Preview mode: your progress is saved in this browser only. In Moodle it is saved automatically.</div>';
+    tallSheet(`<span class="ask">Episode 2 · done</span>
+      ${saved}
+      ${withBon ? `<div class="bon">
+        <h2>Simply Dutch Market</h2>
+        <div class="bline"><span lang="nl">de sinaasappels</span><span>€ 2,49</span></div>
+        <div class="bline"><span lang="nl">de kaas (2×, 2e halve prijs)</span><span>€ 6,57</span></div>
+        <div class="bline"><span lang="nl">het brood</span><span>€ 2,19</span></div>
+        <div class="bline"><span lang="nl">de melk</span><span>€ 1,15</span></div>
+        <div class="brule"></div>
+        <div class="bline total"><span lang="nl">Totaal</span><span>€ 12,40</span></div>
+        <div class="bline"><span>Tijd · time</span><span>${minutes} min</span></div>
+      </div>` : `<h2 class="title">Four things, ${minutes} minutes.</h2>`}
+      <div class="phrases"><h3>Zinnen van vandaag · today's phrases</h3>
+        ${PATTERNS.map(([nl, en]) => `<button type="button" class="pat"><span lang="nl">${nl}</span><small>${en}</small></button>`).join('')}
+      </div>
+      <p class="body">${lesson}</p>
+      <p class="body muted">${way === 'zelfscan' ? 'Self-checkout has its own Dutch words. You will see more of them later in the course.' : 'At the checkout, the cashier will ask you questions. You will practise that in Episode 3.'}</p>
+      <div class="chips">${['de ingang', 'het mandje', 'de sinaasappels', 'per kilo', 'de kaas', '2e halve prijs', 'het brood', 'de melk', 'achterin', 'links', 'de kassa', 'de zelfscan'].map(w => `<button type="button" class="wchip" lang="nl" data-en="${EN[w] || ''}">${w}</button>`).join('')}</div>
+      <button class="go" id="nextBtn" type="button">Next: Your turn at the checkout ▶</button>
+      <button class="ghost" id="againBtn" type="button">↻ Shop again</button>`);
+    document.querySelectorAll('.wchip').forEach(c => { c.setAttribute('data-nl', c.textContent); c.onclick = () => { const on = c.classList.toggle('en'); c.textContent = on ? c.dataset.en : c.getAttribute('data-nl'); }; });
+    $('nextBtn').onclick = () => B.openEpisode(3);
+    $('againBtn').onclick = () => { hideSheet(); normalSheet(); startVideo(); };
+  }
+
+  /* ---------- controls ---------- */
+  $('sndBtn').onclick = e => { e.stopPropagation(); $('sndLabel').textContent = SND.toggle() ? 'On' : 'Off'; };
+  $('ccBtn').onclick = e => { e.stopPropagation(); cc = cc ? 0 : 1; $('ccLabel').textContent = cc ? 'On' : 'Off'; if (!cc) $('subs').innerHTML = ''; };
+  $('reel').addEventListener('click', e => {
+    if (!running) return;
+    if (e.target.closest('.rail, .sheet, button')) return;
+    paused = !paused;
+    if (currentAudio && !currentAudio.ended) { paused ? currentAudio.pause() : currentAudio.play().catch(() => {}); }
+    const f = $('tapflash'); f.textContent = paused ? '❚❚' : '▶'; f.hidden = false; setTimeout(() => { f.hidden = !paused; }, 600);
+  });
+
+  welcome();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Episode 1: Supermarket secrets</title>
+<link rel="stylesheet" href="shared/reel.css">
+<style>
+/* Episode 1 · "The supermarket tea": the whole trip told like juicy gossip, drawn as you listen */
+.paper { position: absolute; inset: 0; background: #EAF5EC url(img/cover_gingham.jpg) center / cover; }
+.sheetpaper { flex: 1; min-height: 0; display: flex; background-color: #FFFDF9; background-image: radial-gradient(rgba(31,51,38,.08) 1px, transparent 1.2px); background-size: 18px 18px; border-radius: 18px; box-shadow: 0 6px 18px rgba(31,51,38,.15); padding: 4px; transform: rotate(-.6deg); }
+.tea { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px; }
+.tea-top { display: flex; flex-direction: column; gap: 7px; }
+.tea-top .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tea-top .segs .seg { background: #F9CCC6; height: 4px; }
+.tea-top .segs .seg i { background: var(--brand-green); }
+.tea-top .ep { font-weight: 700; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #12301C; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 10px; }
+#sketch { flex: 1; min-height: 0; width: 100%; }
+#sketch .ink { fill: none; stroke: #1F3326; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .7s ease-out forwards; }
+#sketch .thin { stroke-width: 2.2; }
+#sketch .hl { opacity: 0; animation: fadein .5s ease-out forwards; }
+#sketch .tx { opacity: 0; animation: fadein .4s ease-out forwards; font-family: var(--font-display); font-weight: 700; fill: #1F3326; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fadein { to { opacity: 1; } }
+.card { flex: none; background: #FFFFFF; border: 2px solid var(--brand-pink); border-radius: 20px; padding: 10px 14px 12px; box-shadow: 0 6px 18px rgba(31,51,38,.1); display: flex; flex-direction: column; gap: 6px; }
+.card .who { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #B4532A; }
+.card .say { margin: 0; font-size: 15px; line-height: 1.4; color: var(--brand-ink); font-weight: 600; }
+.card .say b { color: var(--brand-green-text); }
+.chips2 { display: flex; flex-wrap: wrap; gap: 6px; }
+.nlchip { font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 14px; border: none; border-radius: 999px; padding: 4px 11px; background: var(--brand-cream); color: #5A4A10; cursor: pointer; box-shadow: inset 0 0 0 1.5px #D9B648; }
+.nlchip.en { background: #FFFFFF; color: var(--brand-green-text); box-shadow: inset 0 0 0 1.5px var(--brand-green); }
+.tapnote { font-size: 11px; color: var(--brand-ink-soft); }
+.nav { flex: none; display: flex; gap: 10px; align-items: center; }
+.nav .back { font: inherit; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--brand-pink); background: #FFFFFF; color: var(--brand-ink); font-size: 20px; font-weight: 700; cursor: pointer; flex: none; }
+.nav .back[disabled] { opacity: .35; cursor: default; }
+.nav .more { flex: 1; font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 18px; border: none; border-radius: 999px; padding: 12px 18px; background: var(--brand-green); color: #12301C; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.18); opacity: 0; transform: translateY(6px); transition: opacity .3s, transform .3s; pointer-events: none; }
+.nav .more.on { opacity: 1; transform: none; pointer-events: auto; }
+.mute { flex: none; font: inherit; font-size: 12px; font-weight: 700; border: 1.5px solid var(--brand-pink); background: #FFFFFF; color: var(--brand-ink); border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+.intro { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; background: #EAF5EC url(img/cover_gingham.jpg) center / cover; }
+.intro .note { background: #FFFDF9; border-radius: 22px; padding: 22px 20px; box-shadow: 0 10px 28px rgba(31,51,38,.18); transform: rotate(-1deg); display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.intro .big { font-size: 46px; line-height: 1; }
+.intro h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 28px; color: var(--brand-ink); }
+.intro p { margin: 0; font-size: 15px; color: var(--brand-ink-soft); font-weight: 600; }
+.intro button { font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 18px; border: none; border-radius: 999px; padding: 12px 26px; background: var(--brand-green); color: #12301C; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+.intro small { font-size: 12px; color: var(--brand-ink-soft); }
+@media (prefers-reduced-motion: reduce) { #sketch .ink, #sketch .hl, #sketch .tx { animation-duration: .01s !important; animation-delay: 0s !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><span class="proto">Dutch for Daily Life · Supermarkt · Episode 1</span></div>
+  <div class="reel" id="reel">
+    <div class="paper"></div>
+    <div class="intro" id="intro"><div class="note"><span class="big" aria-hidden="true">🤫</span><span class="ep" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#2F7A3E">EPISODE 1 OF 4</span><h1>Supermarket secrets</h1><p>Everything nobody tells you about shopping in the Netherlands.</p><button type="button" id="introBtn">▶ Tell me the secrets</button><small>Turn your sound on 🔊</small></div></div>
+    <div class="tea">
+    <div class="tea-top"><div class="segs" id="segs"></div><div class="row"><span class="ep">Episode 1 of 4 · Supermarket secrets</span><button class="mute" id="muteBtn" type="button" aria-label="Sound on or off">♪ On</button></div></div>
+    <div class="sheetpaper"><svg id="sketch" viewBox="0 0 360 380" role="img" aria-label="Hand-drawn sketch of the story"></svg></div>
+    <div class="card" aria-live="polite">
+      <span class="who">Your Dutch bestie · psst…</span>
+      <p class="say" id="say"></p>
+      <div class="chips2" id="chips"></div>
+      <span class="tapnote" id="tapnote" hidden>Tap a Dutch word to see the English.</span>
+    </div>
+    <div class="nav">
+      <button class="back" id="backBtn" type="button" aria-label="Previous secret">‹</button>
+      <button class="more" id="moreBtn" type="button">Tell me more 👀</button>
+    </div>
+    </div>
+  </div>
+  <div class="notes"><span>Sketch-style explainer with narration.</span></div>
+</div>
+
+<script src="shared/bridge.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const B = window.Bridge;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  /* ---------- tiny sketch kit: every .ink line draws itself, .hl and .tx fade in ---------- */
+  const L = (d, cls = '') => `<path class="ink ${cls}" d="${d}"/>`;
+  const C = (x, y, r, cls = '') => `<circle class="ink ${cls}" cx="${x}" cy="${y}" r="${r}"/>`;
+  const R = (x, y, w, h, rx = 6, cls = '') => `<rect class="ink ${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"/>`;
+  const HL = (x, y, w, h, c, rx = 10) => `<rect class="hl" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${c}"/>`;
+  const BLOB = (x, y, rx, ry, c) => `<ellipse class="hl" cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}"/>`;
+  const T = (x, y, s, size = 20, anchor = 'middle', fill) => `<text class="tx" x="${x}" y="${y}" font-size="${size}" text-anchor="${anchor}"${fill ? ` style="fill:${fill}"` : ''}>${s}</text>`;
+  const star = (x, y, s = 1) => L(`M${x} ${y - 10 * s} L${x} ${y + 10 * s} M${x - 10 * s} ${y} L${x + 10 * s} ${y} M${x - 6 * s} ${y - 6 * s} L${x + 6 * s} ${y + 6 * s} M${x + 6 * s} ${y - 6 * s} L${x - 6 * s} ${y + 6 * s}`, 'thin');
+  const face = (x, y, r, mood = 'smile') => C(x, y, r) + C(x - r * .35, y - r * .15, 2.5, 'thin') + C(x + r * .35, y - r * .15, 2.5, 'thin') +
+    (mood === 'o' ? C(x, y + r * .35, r * .14, 'thin') : L(`M${x - r * .35} ${y + r * .3} Q${x} ${y + r * .6} ${x + r * .35} ${y + r * .3}`, 'thin'));
+  const person = (x, y, s = 1, extra = '') => face(x, y, 22 * s) + L(`M${x} ${y + 22 * s} L${x} ${y + 85 * s} M${x} ${y + 85 * s} L${x - 20 * s} ${y + 130 * s} M${x} ${y + 85 * s} L${x + 20 * s} ${y + 130 * s}`) + extra;
+  const bubble = (x, y, w, h, tailX, tailY) => `<path class="ink" d="M${x + 14} ${y} H${x + w - 14} Q${x + w} ${y} ${x + w} ${y + 14} V${y + h - 14} Q${x + w} ${y + h} ${x + w - 14} ${y + h} H${tailX + 12} L${tailX} ${tailY} L${tailX - 2} ${y + h} H${x + 14} Q${x} ${y + h} ${x} ${y + h - 14} V${y + 14} Q${x} ${y} ${x + 14} ${y} Z"/>`;
+  const basket = (x, y, s = 1) => L(`M${x - 50 * s} ${y} H${x + 50 * s} L${x + 40 * s} ${y + 50 * s} H${x - 40 * s} Z`) + L(`M${x - 34 * s} ${y} Q${x} ${y - 55 * s} ${x + 34 * s} ${y}`) + L(`M${x - 44 * s} ${y + 17 * s} H${x + 44 * s} M${x - 41 * s} ${y + 34 * s} H${x + 41 * s}`, 'thin');
+
+  const MINT = '#DAF6E0', CREAM = '#F6E7B4', PINK = '#F9CCC6', GREEN = '#75C281';
+  const SCENES = [
+    { say: 'Psst… come closer. Have you heard what <i>really</i> happens in a Dutch supermarket? Nobody tells you this. But I will.', nl: [],
+      draw: () => BLOB(180, 190, 150, 110, PINK) + face(115, 175, 52) + face(250, 175, 52, 'o') +
+        L('M150 205 Q175 195 192 168') + L('M150 205 l8 -16 M150 205 l16 -4', 'thin') + T(178, 108, 'psst!', 26) +
+        star(60, 90) + star(305, 95, .8) + star(320, 270, .7) + star(45, 280, .6) },
+    { say: 'Secret number 1: before you even walk in, grab a <b>mandje</b>. A basket. No basket? Everyone will know you\'re new. Just saying.', nl: ['het mandje', 'de ingang'],
+      draw: () => HL(110, 112, 140, 36, MINT, 6) + R(60, 95, 240, 230, 4) + L('M60 160 L80 140 L100 160 L120 140 L140 160 L160 140 L180 160 L200 140 L220 160 L240 140 L260 160 L280 140 L300 160', 'thin') +
+        R(110, 112, 140, 36, 6) + T(180, 137, 'SUPERMARKT', 18) + R(150, 205, 60, 120, 3) + L('M180 205 V325', 'thin') +
+        basket(318, 300, .45) + basket(318, 285, .45) + basket(318, 270, .45) + L('M268 238 Q290 225 305 250', 'thin') + T(250, 232, 'mandje!', 17, 'middle', '#2F7A3E') + T(180, 355, 'de ingang', 16) },
+    { say: 'Secret number 2: inside, don\'t look for the milk. Look for the word <b>Zuivel</b>. That\'s where the milk lives. Bread? <b>Brood</b>. Easy, right? Wait, it gets better.', nl: ['Zuivel', 'Brood', 'Groente en fruit'],
+      draw: () => HL(36, 62, 128, 34, MINT, 8) + HL(196, 62, 128, 34, CREAM, 8) + R(36, 62, 128, 34, 8) + T(100, 86, 'Zuivel', 20) + R(196, 62, 128, 34, 8) + T(260, 86, 'Brood', 20) +
+        R(30, 110, 140, 210, 4) + L('M30 180 H170 M30 250 H170', 'thin') + R(190, 110, 140, 210, 4) + L('M190 180 H330 M190 250 H330', 'thin') +
+        [50, 80, 110, 140].map(x => R(x - 9, 135, 18, 40, 3, 'thin') + L(`M${x - 5} 135 V127 H${x + 5} V135`, 'thin')).join('') + [50, 80, 110, 140].map(x => R(x - 9, 205, 18, 40, 3, 'thin')).join('') +
+        [215, 260, 305].map(x => L(`M${x - 18} 175 Q${x} 145 ${x + 18} 175 Z`, 'thin') + L(`M${x - 18} 245 Q${x} 215 ${x + 18} 245 Z`, 'thin')).join('') + T(180, 355, 'Groente en fruit → over there', 15) },
+    { say: 'Secret number 3: the yellow signs. That\'s where the drama is. <b>Aanbieding</b> means special offer. <b>2e halve prijs</b>? The second one is half price. People LOVE this.', nl: ['de aanbieding', '2e halve prijs'],
+      draw: () => HL(60, 90, 230, 130, '#FFE27A', 14) + R(60, 90, 230, 130, 14) + T(175, 140, 'Aanbieding', 32) + T(175, 185, '2e halve prijs', 24, 'middle', '#B4532A') +
+        C(255, 268, 42) + L('M285 298 L325 340') + L('M240 250 Q248 240 262 240', 'thin') + star(50, 70) + star(318, 72, .8) + star(70, 300, .7) + T(120, 300, 'OMG', 22, 'middle', '#B4532A') },
+    { say: 'Secret number 4: <b>per kilo</b> or <b>per stuk</b>? Per kilo: you pay for the weight. Per stuk: you pay per piece. Don\'t get fooled!', nl: ['per kilo', 'per stuk'],
+      draw: () => HL(20, 255, 140, 44, MINT, 10) + HL(200, 255, 140, 44, CREAM, 10) + L('M40 230 H140 L130 205 H50 Z') + [70, 92, 114, 81, 103].map((x, i) => C(x, i < 3 ? 190 : 172, 12, 'thin')).join('') +
+        R(60, 230, 80, 12, 3, 'thin') + T(90, 284, 'per kilo', 20) + T(90, 330, '1 kg = €2,49', 15) +
+        C(270, 190, 22) + L('M270 168 l4 -12', 'thin') + T(270, 284, 'per stuk', 20) + T(270, 330, '1 = €0,79', 15) + L('M180 120 V340', 'thin') + T(180, 80, 'kilo  vs  stuk', 18, 'middle', '#2F7A3E') },
+    { say: 'Secret number 5: lost? Totally normal. Here\'s the magic phrase: <b>Sorry, waar is de…?</b> Excuse me, where is the…? Staff will point. Literally. They point.', nl: ['Sorry, waar is de …?', 'achterin', 'links', 'rechts'],
+      draw: () => HL(20, 40, 190, 58, PINK, 18) + bubble(20, 40, 190, 58, 90, 120) + T(115, 76, 'Sorry, waar is de…?', 16) + person(80, 150, 1) + T(40, 160, '?', 30, 'middle', '#B4532A') + T(120, 140, '?', 24, 'middle', '#B4532A') +
+        person(275, 150, 1) + L('M275 200 L210 175', '') + L('M210 175 l12 -2 M210 175 l8 9', 'thin') + L('M300 60 H340 M300 60 l10 -8 M300 60 l10 8', 'thin') + T(320, 95, 'achterin', 14) + T(180, 350, 'links · rechts · achterin', 16, 'middle', '#2F7A3E') },
+    { say: 'Secret number 6, the BIG one: the checkout. The cashier will ask you questions. Fast. In Dutch. One after another. Ready?', nl: ['de kassa'],
+      draw: () => R(40, 240, 280, 70, 6) + L('M40 260 H320', 'thin') + R(230, 200, 60, 40, 4, 'thin') + face(150, 185, 30) + L('M120 240 Q150 205 180 240') +
+        [[20, 40], [190, 30], [10, 120], [230, 110]].map(([x, y]) => bubble(x, y, 120, 50, x + 50, y + 70)).join('') + T(180, 350, 'de kassa', 20) },
+    { say: '<b>Bonuskaart?</b> Do you have a bonus card? <b>Tasje?</b> Do you want a bag? <b>Pinnen?</b> Paying by card? <b>Bon?</b> Do you want the receipt? Four questions. Every. Single. Time.', nl: ['de bonuskaart', 'het tasje', 'pinnen', 'de bon'],
+      draw: () => R(40, 240, 280, 70, 6) + L('M40 260 H320', 'thin') + R(230, 200, 60, 40, 4, 'thin') + face(150, 185, 30) + L('M120 240 Q150 205 180 240') +
+        [[20, 40, MINT, '1 Bonuskaart?'], [190, 30, CREAM, '2 Tasje?'], [10, 120, PINK, '3 Pinnen?'], [230, 110, MINT, '4 Bon?']].map(([x, y, c, t]) => HL(x, y, 120, 50, c, 14) + bubble(x, y, 120, 50, x + 50, y + 70) + T(x + 60, y + 31, t, 16)).join('') + T(180, 350, 'every. single. time.', 18, 'middle', '#B4532A') },
+    { say: 'Surprise! You can skip the cashier. <b>Zelfscan</b>. Self-checkout. But even the machine speaks Dutch. Of course it does.', nl: ['de zelfscan'],
+      draw: () => HL(205, 80, 110, 70, MINT, 8) + R(190, 60, 140, 280, 10) + R(205, 80, 110, 70, 6) + T(260, 112, 'Wil je', 15) + T(260, 132, 'een bon?', 15) + R(215, 190, 90, 40, 4, 'thin') + L('M225 210 H295', 'thin') +
+        person(90, 170, .95) + L('M70 300 Q60 320 40 318', 'thin') + T(120, 120, 'beep!', 20, 'middle', '#B4532A') + T(260, 365, 'de zelfscan', 18) },
+    { say: 'So now you know the secrets. Don\'t tell anyone. Let\'s go shopping. And this time, <i>you</i> do the talking.', nl: [],
+      draw: () => BLOB(180, 200, 140, 110, MINT) + basket(180, 220, 1.3) + L('M180 150 C150 110 110 140 180 185 C250 140 210 110 180 150 Z') + star(70, 120) + star(300, 110, .9) + star(300, 300, .7) + star(60, 300, .6) + T(180, 345, 'You\'re ready!', 26, 'middle', '#2F7A3E') }
+  ];
+  const EN = { 'het mandje': 'the basket', 'de ingang': 'the entrance', 'Zuivel': 'dairy (milk, yoghurt, cheese)', 'Brood': 'bread', 'Groente en fruit': 'vegetables and fruit', 'de aanbieding': 'the special offer', '2e halve prijs': '2nd one half price', 'per kilo': 'price per kilo', 'per stuk': 'price per piece', 'Sorry, waar is de …?': 'Excuse me, where is the …?', 'achterin': 'at the back', 'links': 'left', 'rechts': 'right', 'de kassa': 'the checkout', 'de bonuskaart': 'the bonus card', 'het tasje': 'the (plastic) bag', 'pinnen': 'to pay by card', 'de bon': 'the receipt', 'de zelfscan': 'the self-checkout' };
+
+  /* ---------- little sound effects, made in the browser (quiet under the voice) ---------- */
+  const FX = (function () {
+    let ctx = null;
+    const ac = () => { try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch (e) { ctx = null; } return ctx; };
+    function tone(f, dur, type = 'sine', vol = .1, at = 0, slide) {
+      const c = ac(); if (!c || !soundOn) return;
+      const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + at;
+      o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05);
+    }
+    function noise(dur, vol, at = 0, f0 = 400, f1 = 3000, q = 1.2) {
+      const c = ac(); if (!c || !soundOn) return;
+      const b = c.createBuffer(1, Math.max(1, c.sampleRate * dur), c.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain(), t = c.currentTime + at;
+      bp.type = 'bandpass'; bp.Q.value = q; bp.frequency.setValueAtTime(f0, t); bp.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * .3); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      src.buffer = b; src.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t); src.stop(t + dur + .05);
+    }
+    return {
+      whoosh: () => noise(.45, .09, 0, 300, 2600),
+      scribble: (n = 6) => { for (let i = 0; i < n; i++) noise(.09, .025, .15 + i * .13 + Math.random() * .05, 1800, 2600, 4); },
+      sparkle: () => [1319, 1568, 1976, 2637].forEach((f, i) => tone(f, .35, 'sine', .05, i * .07)),
+      pop: () => tone(600, .12, 'sine', .1, 0, 1200),
+      ding: () => { tone(1568, .4, 'sine', .05); tone(2093, .5, 'sine', .04, .08); },
+      bubbles: () => [0, 1, 2, 3].forEach(i => tone(500 + i * 140, .14, 'sine', .09, .6 + i * .45, 900 + i * 160)),
+      drum: () => { for (let i = 0; i < 10; i++) tone(110, .08, 'triangle', .08, i * .06); tone(220, .4, 'triangle', .1, .65); },
+      tada: () => { tone(784, .18, 'triangle', .08); tone(1047, .5, 'triangle', .08, .16); tone(1319, .6, 'sine', .05, .16); },
+      win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .5, 'triangle', .07, i * .12))
+    };
+  })();
+  const SCENE_FX = { 0: 'sparkle', 6: 'drum', 7: 'bubbles', 8: 'tada', 9: 'win' };
+
+  /* ---------- narration: audio/sdm_tea_01.mp3 … 10 ---------- */
+  let audio = null, soundOn = true;
+  function narrate(i) {
+    try { if (audio) audio.pause(); } catch (e) {}
+    if (!soundOn) return;
+    audio = new Audio(`audio/sdm_tea_${String(i + 1).padStart(2, '0')}.mp3`);
+    audio.onerror = () => {};
+    const p = audio.play(); if (p && p.catch) p.catch(() => {});
+  }
+
+  let idx = 0, seen = 0;
+  $('segs').innerHTML = '<span class="seg"><i></i></span>'.repeat(SCENES.length);
+  function show(i) {
+    idx = i; seen = Math.max(seen, i);
+    const sc = SCENES[i], svg = $('sketch');
+    svg.innerHTML = sc.draw();
+    let n = 0;
+    svg.querySelectorAll('.ink').forEach(el => { el.setAttribute('pathLength', '1'); el.style.animationDelay = (n++ * 0.11) + 's'; });
+    const after = n * 0.11;
+    svg.querySelectorAll('.hl').forEach((el, k) => { el.style.animationDelay = (0.2 + k * 0.15) + 's'; });
+    svg.querySelectorAll('.tx').forEach((el, k) => { el.style.animationDelay = Math.min(after, 0.4 + k * 0.25) + 's'; });
+    $('say').innerHTML = sc.say;
+    $('chips').innerHTML = sc.nl.map(w => `<button type="button" class="nlchip" lang="nl" data-nl="${w}">${w}</button>`).join('');
+    $('chips').querySelectorAll('.nlchip').forEach(c => c.onclick = () => { FX.pop(); const on = c.classList.toggle('en'); c.textContent = on ? EN[c.dataset.nl] : c.dataset.nl; B.interaction('ep_tea_word_en', c.dataset.nl); });
+    $('tapnote').hidden = !sc.nl.length;
+    Array.from($('segs').children).forEach((s, k) => { s.firstChild.style.width = k <= i ? '100%' : '0'; });
+    $('backBtn').disabled = i === 0;
+    const last = i === SCENES.length - 1;
+    const m = $('moreBtn'); m.textContent = last ? "Let's go shopping ▸" : 'Tell me more 👀'; m.classList.remove('on');
+    setTimeout(() => { m.classList.add('on'); FX.ding(); }, Math.min(2600, 900 + after * 600));
+    if (SCENE_FX[i]) FX[SCENE_FX[i]](); FX.scribble(Math.min(9, 3 + Math.round(n / 4)));
+    narrate(i);
+  }
+  $('moreBtn').onclick = () => {
+    if (idx < SCENES.length - 1) { FX.whoosh(); show(idx + 1); return; }
+    try { if (audio) audio.pause(); } catch (e) {}
+    B.episodeDone(1);
+    if (B.embedded) B.openEpisode(2);
+    else { $('say').innerHTML = '<b>Episode 1 done!</b> In the course, Episode 2 starts here: your first Dutch supermarket trip.'; $('chips').innerHTML = ''; $('moreBtn').classList.remove('on'); }
+  };
+  $('backBtn').onclick = () => { if (idx > 0) { FX.whoosh(); show(idx - 1); } };
+  $('muteBtn').onclick = () => { soundOn = !soundOn; $('muteBtn').textContent = soundOn ? '♪ On' : '♪ Off'; if (!soundOn && audio) audio.pause(); };
+  $('introBtn').onclick = () => { $('intro').remove(); FX.whoosh(); show(0); };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Episode 3: Your turn at the checkout</title>
+<link rel="stylesheet" href="shared/reel.css">
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <span class="proto">Dutch for Daily Life · Supermarkt · Episode 3</span>
+  </div>
+
+  <div class="reel" id="reel">
+    <svg class="scene" viewBox="0 0 360 640" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Point-of-view checkout scene: Daan the cashier behind the counter at Kassa 3">
+      <image id="bgPhoto" href="img/daan.jpg" x="0" y="0" width="360" height="640" preserveAspectRatio="xMidYMid slice"/>
+      <g id="daan"></g>
+      <!-- scanner flash at Daan's hand-scanner -->
+      <rect class="laser" id="laser" x="226" y="282" width="56" height="4" rx="2" fill="#FF3B30"/>
+      <!-- props the story moves around -->
+      <g class="item" id="it-melk" style="display:none"></g><g class="item" id="it-brood" style="display:none"></g><g class="item" id="it-kaas" style="display:none"></g><g class="item" id="it-appels" style="display:none"></g>
+      <g class="item" id="bagNew" style="opacity:0"></g>
+      <g class="item" id="bonusCard" style="opacity:0"><rect x="150" y="640" width="64" height="40" rx="6" fill="#F7B733" stroke="#FFFFFF" stroke-width="2"/><text x="182" y="665" text-anchor="middle" font-size="10" font-family="Quicksand, sans-serif" font-weight="700" fill="#3A2600">BONUS</text></g>
+      <g id="terminal" transform="translate(112 52) scale(.68)">
+        <rect class="receipt-strip" id="receiptStrip" x="266" y="430" width="52" height="40" fill="#FFFFFF" stroke="#D5DED6"/>
+        <rect x="236" y="470" width="112" height="170" rx="16" fill="#202423" stroke="#FFFFFF" stroke-width="3"/>
+        <rect x="248" y="484" width="88" height="54" rx="5" fill="#DAF6E0"/>
+        <text id="termText" x="292" y="516" text-anchor="middle" font-size="13" font-family="Quicksand, sans-serif" font-weight="700" fill="#173326">Welkom</text>
+        <g fill="#3A403E"><rect x="252" y="552" width="22" height="12" rx="2"/><rect x="281" y="552" width="22" height="12" rx="2"/><rect x="310" y="552" width="22" height="12" rx="2"/><rect x="252" y="572" width="22" height="12" rx="2"/><rect x="281" y="572" width="22" height="12" rx="2"/><rect x="310" y="572" width="22" height="12" rx="2"/></g>
+      </g>
+      <g class="item" id="bankCard" style="opacity:0"><rect x="262" y="640" width="64" height="40" rx="6" fill="#2C3E66" stroke="#FFFFFF" stroke-width="2"/><rect x="272" y="652" width="13" height="10" rx="2" fill="#E3C35A"/></g>
+    </svg>
+
+    <div class="hud">
+      <div class="segs" id="segs"></div>
+      <div class="who-row"><span class="avatar" aria-hidden="true">SD</span><span>Simply Dutch Market <small>· Kassa 3</small></span></div>
+    </div>
+    <div class="badge" id="pausedBadge" hidden>❚❚ Your turn</div>
+    <div class="say-badge" id="sayBadge" hidden>Now you: say it out loud</div>
+    <div class="subs" id="subs" aria-live="polite"></div>
+    <div class="acts" id="nextWrap" hidden><button type="button" class="actbtn" id="nextLine">Next ▸</button></div>
+    <div class="tapflash" id="tapflash" hidden>❚❚</div>
+    <div class="hint" id="hint" hidden>Tap the video to pause</div>
+    <div class="introtag" id="introTag" hidden></div>
+    <div class="rewind-layer" id="rewindLayer" hidden>⏪ Let's try that again</div>
+    <button class="skip" id="skipBtn" type="button" hidden>Skip intro ⏭</button>
+
+    <div class="rail" id="rail" hidden>
+      <label>
+        <button type="button" id="ccBtn" aria-label="Subtitles: Dutch and English">CC</button><span id="ccLabel">NL+EN</span>
+      </label>
+    </div>
+
+    <div class="sheet" id="sheet" hidden aria-live="polite"></div>
+
+    <div class="start pick" id="pickLayer">
+      <span class="ep">Dutch for Daily Life · Supermarkt</span>
+      <h1>Who are you shopping as?</h1>
+      <p>Choose your character. You will hear their voice in every episode.</p>
+      <div class="persons">
+        <button class="person" type="button" data-char="Mira">
+          <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="40" fill="#F9CCC6"/><path d="M18 80c0-16 10-26 22-26s22 10 22 26z" fill="#7B4FA8"/><circle cx="40" cy="36" r="16" fill="#D9A27E"/><path d="M24 36c-1-14 8-20 16-20s17 6 16 20c-4-8-10-11-16-11s-12 3-16 11z" fill="#2E1E16"/><circle cx="40" cy="15" r="7" fill="#2E1E16"/><circle cx="34" cy="37" r="1.8" fill="#1D1F1E"/><circle cx="46" cy="37" r="1.8" fill="#1D1F1E"/><path d="M35 44q5 4 10 0" stroke="#8E4A3A" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          <strong>Mira, 31</strong><span>Moved to Utrecht 3 weeks ago. Dreads being asked a question at the checkout.</span>
+        </button>
+        <button class="person" type="button" data-char="Rahul">
+          <svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="40" fill="#DAF6E0"/><path d="M18 80c0-16 10-26 22-26s22 10 22 26z" fill="#2C3E66"/><circle cx="40" cy="36" r="16" fill="#B07A55"/><path d="M24 33c0-12 8-17 16-17s16 5 16 17c-5-6-10-8-16-8s-11 2-16 8z" fill="#1A1414"/><path d="M27 41c2 11 8 14 13 14s11-3 13-14c-3 5-8 7-13 7s-10-2-13-7z" fill="#1A1414"/><circle cx="34" cy="36" r="1.8" fill="#1D1F1E"/><circle cx="46" cy="36" r="1.8" fill="#1D1F1E"/></svg>
+          <strong>Rahul, 28</strong><span>Moved to Eindhoven 2 weeks ago. Wants to try Dutch outside work.</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="start" id="startLayer" hidden>
+      <span class="ep">Supermarkt · Episode 3 of 4</span>
+      <h1>Your turn at the checkout</h1>
+      <p>Every checkout asks the same few questions. Learn to catch the key word and answer in your own style.</p>
+      <p class="as">Shopping as <b id="asName">Mira</b> · <button class="link" type="button" id="changeBtn">change</button></p>
+      <button class="go" id="startBtn" type="button">▶ Play</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <span id="voiceStatus">Voices: recorded audio, generated with elevenlabs.io.</span>
+    
+  </div>
+</div>
+
+<script src="shared/bridge.js"></script>
+<script>
+/* Episode 3 reports through the course shell (shared/bridge.js); the shell owns the SCORM session. */
+const SCORM = {
+  init() {},
+  savedChar: () => Bridge.getChar(),
+  saveChar: c => Bridge.setChar(c),
+  interaction: (id, response) => Bridge.interaction(id, response),
+  complete: () => Bridge.episodeDone(3)
+};
+
+(function () {
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  let charName = 'Mira';
+  let paused = false, running = false, frozen = false, cc = 0;
+  let st = {}, chosen = [], step = 0, lastDaan = '', runCount = 0, skipped = false;
+  const ccModes = ['NL+EN', 'NL', 'Off'];
+  const learner = () => charName.toLowerCase();
+
+  // ---------- situation and questions ----------
+  function newSituation() { st = { card: Math.random() < 0.5, bag: Math.random() < 0.5, receipt: Math.random() < 0.5 }; }
+  function questions() {
+    return [
+      { id: 'card', say: 'Hoi! Heb je een bonuskaart?', en: 'Hi! Do you have a bonus card?', html: 'Hoi! Heb je een <span class="key">bonuskaart</span>?',
+        chip: st.card ? 'Bonus card ✔ in your wallet' : 'No bonus card ✖',
+        options: st.card ? [{ nl: 'Ja, hier.', en: 'Yes, here.' }, { nl: 'Ja, momentje.', en: 'Yes, one moment.' }, { nl: 'Ja, hoor.', en: 'Yes, sure.' }]
+                         : [{ nl: 'Nee, sorry.', en: 'No, sorry.' }, { nl: 'Nee, die heb ik niet.', en: "No, I don't have one." }, { nl: 'Nee, helaas.', en: 'No, unfortunately.' }],
+        note: st.card ? '<b>Momentje</b> = one moment. Handy while you look for your card.' : '<b>Helaas</b> = unfortunately. All three simply mean “no”.',
+        reply: st.card ? 'Dank je.' : 'Geen probleem.', replyEn: st.card ? 'Thanks.' : 'No problem.' },
+      { id: 'bag', say: 'Wil je een tasje?', en: 'Would you like a bag?', html: 'Wil je een <span class="key">tasje</span>?',
+        chip: st.bag ? 'Own bag ✔' : 'No bag with you ✖',
+        options: st.bag ? [{ nl: 'Nee, dank je.', en: 'No, thank you.' }, { nl: 'Nee, hoeft niet.', en: 'No need.' }, { nl: 'Nee, ik heb zelf een tas.', en: 'No, I have my own bag.' }]
+                        : [{ nl: 'Ja, graag.', en: 'Yes, please.' }, { nl: 'Ja, alstublieft.', en: 'Yes, please (polite).' }, { nl: 'Ja, doe maar.', en: 'Yes, go ahead.' }],
+        note: st.bag ? '<b>Hoeft niet</b> = no need. Casual and very common.' : 'Bags cost a few cents here. <b>Doe maar</b> = go ahead.',
+        reply: st.bag ? 'Prima.' : 'Alsjeblieft.', replyEn: st.bag ? 'Fine.' : 'Here you go.' },
+      { id: 'pin', say: 'Dat is dan twaalf euro veertig. Pinnen?', en: "That's twelve euros forty. Paying by card?", html: 'Dat is dan twaalf euro veertig. <span class="key">Pinnen</span>?',
+        chip: 'Bank card ✔',
+        options: [{ nl: 'Ja, pinnen.', en: 'Yes, by card.' }, { nl: 'Ja, met de kaart.', en: 'Yes, with the card.' }, { nl: 'Ja, graag.', en: 'Yes, please.' }],
+        note: '<b>Pinnen</b> = pay by debit card. Many Dutch shops prefer it; some take nothing else.',
+        reply: 'Prima, de pin staat klaar.', replyEn: 'Fine, the card machine is ready.' },
+      { id: 'bon', say: 'Wil je de bon?', en: 'Would you like the receipt?', html: 'Wil je de <span class="key">bon</span>?',
+        chip: 'Your choice: yes or no',
+        // a receipt is a preference, not a fact: yes and no are both fine here
+        options: [{ nl: 'Ja, graag.', en: 'Yes, please.' }, { nl: 'Nee, dank je.', en: 'No, thank you.' }, { nl: 'Nee, hoeft niet.', en: 'No need.' }],
+        note: '<b>Bon</b> or <b>bonnetje</b> = the receipt. Want it? <b>Ja, graag.</b> Don\'t need it? <b>Nee, dank je.</b> Both are perfectly fine.',
+        reply: st.receipt ? 'Alsjeblieft.' : 'Oké.', replyEn: st.receipt ? 'Here you go.' : 'Okay.' },
+      { id: 'bye', say: 'Fijne dag!', en: 'Have a nice day!', html: '<span class="key">Fijne dag</span>!', chip: 'Time to say goodbye',
+        options: [{ nl: 'Jij ook!', en: 'You too!' }, { nl: 'Dank je, jij ook!', en: 'Thanks, you too!' }, { nl: 'Doei!', en: 'Bye!' }],
+        note: '<b>Doei</b> is a friendly, informal bye. You will hear it everywhere.', reply: '', replyEn: '' }
+    ];
+  }
+  let qs = [];
+
+  // ---------- audio: recorded files first, device speech as fallback ----------
+  const DAAN_LINES = { 'Hoi! Heb je een bonuskaart?': '01', 'Dank je.': '02', 'Geen probleem.': '03', 'Wil je een tasje?': '04', 'Prima.': '05', 'Alsjeblieft.': '06',
+    'Dat is dan twaalf euro veertig. Pinnen?': '07', 'Prima, de pin staat klaar.': '08', 'Wil je de bon?': '09', 'Oké.': '10', 'Fijne dag!': '11',
+    '…Je bonuskaart?': '12', 'Wil je je aanmelden voor de bonuskaart?': '13' };
+  const LEARNER_LINES = ['Ja, hier.', 'Ja, momentje.', 'Ja, hoor.', 'Nee, sorry.', 'Nee, die heb ik niet.', 'Nee, helaas.', 'Nee, dank je.', 'Nee, hoeft niet.',
+    'Nee, ik heb zelf een tas.', 'Ja, graag.', 'Ja, alstublieft.', 'Ja, doe maar.', 'Ja, pinnen.', 'Ja, met de kaart.', 'Nee, laat maar.', 'Jij ook!', 'Dank je, jij ook!', 'Doei!', 'Ja!'];
+  function fileFor(text, who) {
+    if (who === 'daan') { const n = DAAN_LINES[text]; return n ? 'audio/sdm_e08_daan_' + n + '.mp3' : null; }
+    const i = LEARNER_LINES.indexOf(text);
+    return i >= 0 ? 'audio/sdm_e08_' + who + '_' + String(i + 1).padStart(2, '0') + '.mp3' : null;
+  }
+  let currentAudio = null, currentDone = null;
+  // stopping a line also releases whoever is waiting for it to end (needed for "Skip intro")
+  function stopAudio() {
+    try { if (currentAudio) currentAudio.pause(); speechSynthesis.cancel(); } catch (e) {}
+    if (currentDone) { const d = currentDone; currentDone = null; d(); }
+  }
+  function playFile(src, rate) {
+    return new Promise((resolve, reject) => {
+      stopAudio();
+      const a = new Audio(src);
+      currentAudio = a; currentDone = resolve;
+      a.playbackRate = rate || 1;
+      a.onended = () => resolve();
+      a.onerror = () => reject(new Error('audio'));
+      const p = a.play();
+      if (p && p.catch) p.catch(reject);
+    });
+  }
+  function ttsSpeak(text, opts) {
+    const minMs = 500 + text.length * 70 / (opts.rate || 1);
+    return new Promise(resolve => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      if (!('speechSynthesis' in window)) { setTimeout(finish, minMs); return; }
+      try {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'nl-NL'; u.rate = opts.rate || 1;
+        const v = speechSynthesis.getVoices().find(x => /^nl/i.test(x.lang)); if (v) u.voice = v;
+        u.onend = finish; u.onerror = finish;
+        speechSynthesis.speak(u);
+        setTimeout(finish, minMs + 4000);
+      } catch (e) { setTimeout(finish, minMs); }
+    });
+  }
+  function speak(text, opts) {
+    opts = opts || {};
+    const src = fileFor(text, opts.who || 'daan');
+    if (!src) return ttsSpeak(text, opts);
+    // a line without a recording yet stays silent: the subtitle carries it
+    return playFile(src, opts.rate).catch(() => sleep(700 + text.length * 60));
+  }
+  let actx = null;
+  function beep() {
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.frequency.value = 1650; o.type = 'square';
+      g.gain.setValueAtTime(0.05, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.12);
+      o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.13);
+    } catch (e) {}
+  }
+
+  // ---------- scene helpers ----------
+  const daan = $('daan');
+  function subs(who, nl, en) {
+    $('subs').className = 'subs dlg';
+    if (!nl || (cc === 2 && who === 'Daan')) { $('subs').innerHTML = ''; return; }
+    // Dutch first; the English opens with a tap (or always, in NL+EN subtitle mode)
+    $('subs').innerHTML = '<span class="who">' + who + '</span><button type="button" class="tapnl' + (cc === 0 ? ' open' : '') + '"><span class="nl" lang="nl">' + nl + '</span>' + (en ? '<span class="en">' + en + '</span><small class="tapme">tap for English</small>' : '') + '</button>';
+    const t = $('subs').querySelector('.tapnl'); if (t) t.onclick = e => { e.stopPropagation(); t.classList.toggle('open'); };
+  }
+  async function daanSays(nl, en, noWait) {
+    if (!nl) return;
+    await gate();
+    lastDaan = nl;
+    subs('Daan', nl, en);
+    daan.classList.add('talk');
+    await speak(nl, { who: 'daan' });
+    daan.classList.remove('talk');
+    if (noWait) await sleep(300); else await tapNext();
+  }
+  async function youSay(nl, en) {
+    subs(charName + ' (you)', nl, en);
+    await speak(nl, { who: learner() });
+    $('sayBadge').hidden = false;
+    await tapNext('I said it ▸');
+    $('sayBadge').hidden = true;
+  }
+  function move(id, x, y, op) { const el = $(id); el.style.transform = 'translate(' + x + 'px,' + y + 'px)'; if (op !== undefined) el.style.opacity = op; }
+  async function scanItem(id, dx) {
+    await gate();
+    move(id, dx, 0); await sleep(750);
+    $('laser').classList.remove('on'); void $('laser').getBBox(); $('laser').classList.add('on'); beep();
+    move(id, dx + 70, -40, 0); await sleep(500);
+  }
+  function buildSegs() { $('segs').innerHTML = '<span class="seg"><i></i></span>'.repeat(5); }
+  function setProgress() { Array.from($('segs').children).forEach((s, i) => s.classList.toggle('done', i < step)); }
+  function gate() { return new Promise(res => { const c = () => paused ? setTimeout(c, 150) : res(); c(); }); }
+  // the learner decides when to move on, so there is time to read and translate
+  function tapNext(label) {
+    if (skipped || introFast) return introFast ? sleep(350) : Promise.resolve();
+    return new Promise(res => {
+      $('nextLine').textContent = label || 'Next ▸'; $('nextWrap').hidden = false;
+      const go = () => { $('nextWrap').hidden = true; skipWait = null; stopAudio(); res(); };
+      skipWait = go;
+      $('nextLine').onclick = e => { e.stopPropagation(); go(); };
+    });
+  }
+  let skipWait = null;
+
+  // ---------- decision point: the frame freezes, the sheet rises ----------
+  function decide(q) {
+    return new Promise(resolve => {
+      frozen = true;
+      $('reel').classList.add('frozen'); $('pausedBadge').hidden = false;
+      $('subs').innerHTML = '';
+      const shuffled = q.options.slice().sort(() => Math.random() - 0.5);
+      const sheet = $('sheet');
+      sheet.hidden = false;
+      sheet.innerHTML = '<span class="grab"></span><span class="ask">Daan asks</span><div class="question" id="qText" lang="nl">' + q.html + '</div>' + (runCount > 1 ? '<button class="showtr" type="button" id="trBtn">Show translation</button><div class="q-en" id="qEn" hidden>' + q.en + '</div>' : '<div class="q-en">' + q.en + '</div>') +
+        '<div class="tools"><button class="tool" type="button" id="againBtn">↻ Again</button><button class="tool" type="button" id="slowBtn">0.7× Slower</button><button class="tool" type="button" id="keyBtn">Aa Key word</button></div>' +
+        '<span class="chip">' + q.chip + '</span><span class="ask pickline">All three are correct. Pick your style.</span><div class="answers" id="answers"></div><div id="after"></div>';
+      if ($('trBtn')) $('trBtn').onclick = () => { $('qEn').hidden = false; $('trBtn').hidden = true; };
+      $('againBtn').onclick = () => speak(q.say, { who: 'daan' });
+      $('slowBtn').onclick = () => speak(q.say, { who: 'daan', rate: 0.7 });
+      $('keyBtn').onclick = () => { const on = $('qText').classList.toggle('showkey'); $('keyBtn').textContent = on ? 'Aa Hide key word' : 'Aa Key word'; };
+      shuffled.forEach(o => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'answer';
+        b.innerHTML = '<span class="nl" lang="nl">' + o.nl + '</span><span class="en">' + o.en + '</span><span class="state"></span>';
+        b.onclick = () => {
+          if (b.classList.contains('locked')) { speak(o.nl, { rate: 0.9, who: learner() }); return; }
+          Array.from($('answers').children).forEach(x => { x.classList.add('locked'); if (x !== b) x.querySelector('.state').textContent = '▶ Also correct'; });
+          b.classList.add('picked'); b.querySelector('.state').textContent = '✔ Your answer';
+          speak(o.nl, { who: learner() });
+          $('after').innerHTML = '<div class="note">' + q.note + '</div><button class="go" id="contBtn" type="button" style="width:100%;margin-top:10px">Continue ▶</button>';
+          $('contBtn').focus({ preventScroll: true });
+          // after the pick the helper rows are no longer needed: free the room so the question stays in view
+          $('sheet').querySelectorAll('.tools, .chip, .ask.pickline, .showtr').forEach(el => { el.hidden = true; });
+          SCORM.interaction('ep3_' + q.id, o.nl);
+          $('sheet').scrollTo({ top: 0 });
+          $('contBtn').onclick = () => {
+            stopAudio();
+            frozen = false;
+            sheet.hidden = true;
+            $('reel').classList.remove('frozen'); $('pausedBadge').hidden = true;
+            resolve(o);
+          };
+        };
+        $('answers').appendChild(b);
+      });
+      const first = $('answers').firstChild; if (first) first.focus({ preventScroll: true });
+    });
+  }
+  const POSE_FOR = { card: 'daan_card', bag: 'daan_bag', pin: 'daan_pin', bon: 'daan_bon', bye: 'daan_bye' };
+  async function ask(q) {
+    pose(POSE_FOR[q.id] || 'daan');
+    await daanSays(q.say, q.en, true);   // the question goes straight to the answer sheet (it has translate, again and slower)
+    const o = await decide(q);
+    chosen.push(o.nl); step++; setProgress();
+    await youSay(o.nl, o.en);
+    return o;
+  }
+
+  // ---------- Episode 3 opening: "Ja! Ja! Ja!" (first viewing only, skippable) ----------
+  // inner voice of the learner's character (audio/sdm_e03_{mira|rahul}_think_NN.mp3)
+  const THINK3 = ['Now the part I was scared of: the checkout. Kassa 3. Okay…',
+    'Please don\'t ask me anything. Please don\'t ask me anything…',
+    'I said yes to everything. I don\'t even know what I said yes to.',
+    'Okay. This time, I listen for the key word.',
+    'Here\'s the secret: they almost always ask the same three things. Bonuskaart, tasje, bon.'];
+  async function think(text, ms) {
+    if (skipped) return;
+    const n = THINK3.indexOf(text);
+    if (n >= 0) playFile('audio/sdm_e03_' + learner() + '_think_' + String(n + 1).padStart(2, '0') + '.mp3').catch(() => {});
+    $('subs').className = 'subs think'; $('subs').innerHTML = '<span class="bubble"><small>' + charName + ' is thinking…</small>' + text + '</span>';
+    await sleep(600); await tapNext();
+  }
+  async function panicYes() {
+    if (skipped) return;
+    subs(charName + ' (you)', 'Ja!', 'Yes!');
+    await speak('Ja!', { who: learner() });
+    await sleep(500);
+  }
+  async function daanIntro(nl, en) { if (skipped) return; introFast = true; await daanSays(nl, en); introFast = false; }
+  let introFast = false;
+  async function intro() {
+    skipped = false; $('skipBtn').hidden = false;
+    $('introTag').textContent = '👀 Watch first: ' + charName + '\'s first time at the checkout'; $('introTag').hidden = false;
+    await think('Now the part I was scared of: the checkout. Kassa 3. Okay…', 2600);
+    await think('Please don\'t ask me anything. Please don\'t ask me anything…', 2200);
+    pose('daan_card'); await daanIntro('Hoi! Heb je een bonuskaart?', 'Hi! Do you have a bonus card?');
+    await panicYes();
+    await daanIntro('…Je bonuskaart?', 'Your bonus card?');
+    pose('daan_bag'); await daanIntro('Wil je een tasje?', 'Would you like a bag?');
+    await panicYes();
+    if (!skipped) $('bagNew').style.opacity = 1;
+    pose('daan_bon'); await daanIntro('Wil je de bon?', 'Would you like the receipt?');
+    await panicYes();
+    if (!skipped) $('receiptStrip').classList.add('out');
+    pose('daan_card'); await daanIntro('Wil je je aanmelden voor de bonuskaart?', 'Do you want to sign up for the bonus card?');
+    await panicYes();
+    await think('I said yes to everything. I don\'t even know what I said yes to.', 3000);
+    if (!skipped) {
+      $('reel').classList.add('rewinding'); $('rewindLayer').hidden = false; beep();
+      await sleep(1600);
+      $('reel').classList.remove('rewinding'); $('rewindLayer').hidden = true;
+    }
+    resetScene();
+    skipped = false;
+    $('skipBtn').hidden = true;
+    $('introTag').textContent = '🎯 Your turn! Listen for the key word'; setTimeout(() => { $('introTag').hidden = true; }, 3500);
+    await think('Okay. This time, I listen for the key word.', 2400);
+    $('subs').innerHTML = '';
+  }
+  function showHint() { $('hint').hidden = false; setTimeout(() => { $('hint').hidden = true; }, 3000); }
+
+  // ---------- the reel ----------
+  const POSES = ['daan', 'daan_card', 'daan_bag', 'daan_pin', 'daan_bon', 'daan_bye'];
+  const poseOk = {};
+  function poseSrc(k, c) { return (c === 'Rahul' ? 'img/rahul/' : 'img/') + k + '.jpg'; }
+  function preloadPoses() { ['Mira', 'Rahul'].forEach(c => POSES.forEach(k => { const i = new Image(); i.onload = () => { poseOk[c + k] = true; }; i.src = poseSrc(k, c); })); }
+  function pose(k) { const key = poseOk[charName + k] ? k : 'daan'; $('bgPhoto').setAttribute('href', poseSrc(key, charName)); }
+  function setPhoto() { pose('daan'); }
+  function resetScene() {
+    setPhoto();
+    ['it-melk', 'it-brood', 'it-kaas', 'it-appels'].forEach(id => { $(id).style.transform = ''; $(id).style.opacity = 1; });
+    ['bonusCard', 'bankCard', 'bagNew'].forEach(id => { $(id).style.transform = ''; $(id).style.opacity = 0; });
+    $('receiptStrip').classList.remove('out'); $('termText').textContent = 'Welkom'; $('subs').innerHTML = '';
+  }
+  async function run() {
+    running = true; runCount++; newSituation(); qs = questions(); chosen = []; step = 0;
+    buildSegs(); setProgress(); resetScene(); $('sheet').hidden = true;
+    if (runCount === 1) { showHint(); await intro(); }
+    $('reel').classList.add('moving'); await sleep(900); $('reel').classList.remove('moving');
+
+    await ask(qs[0]);
+    if (st.card) { move('bonusCard', 0, -250, 1); await sleep(800); beep(); move('bonusCard', 0, -250, 0); }
+    await daanSays(qs[0].reply, qs[0].replyEn);
+
+    subs('', '', ''); pose('daan'); $('reel').classList.add('moving');
+    for (let k = 0; k < 4; k++) { await gate(); await sleep(650); $('laser').classList.remove('on'); void $('laser').getBBox(); $('laser').classList.add('on'); beep(); }
+    $('reel').classList.remove('moving');
+
+    await ask(qs[1]);
+    if (!st.bag) $('bagNew').style.opacity = 1;
+    await daanSays(qs[1].reply, qs[1].replyEn);
+
+    $('termText').textContent = '€ 12,40';
+    await ask(qs[2]);
+    await daanSays(qs[2].reply, qs[2].replyEn);
+    $('termText').textContent = 'Pas aanbieden'; await sleep(500);
+    move('bankCard', -10, -230, 1); await sleep(900); beep(); $('termText').textContent = 'Betaling OK'; await sleep(500); move('bankCard', 0, 0, 0);
+
+    const bonPick = await ask(qs[3]);
+    const wantsBon = /^Ja/.test(bonPick.nl);
+    if (wantsBon) { $('receiptStrip').classList.add('out'); beep(); }
+    await daanSays(wantsBon ? 'Alsjeblieft.' : 'Oké.', wantsBon ? 'Here you go.' : 'Okay.');
+
+    daan.classList.add('nod');
+    await ask(qs[4]);
+    daan.classList.remove('nod');
+    await think('Here\'s the secret: they almost always ask the same three things. Bonuskaart, tasje, bon.', 3200);
+    subs('', '', '');
+    finish();
+  }
+  function finish() {
+    running = false;
+    const labels = ['Bonuskaart', 'Tasje', 'Pinnen', 'Bon', 'Goodbye'];
+    const sheet = $('sheet');
+    sheet.hidden = false;
+    sheet.innerHTML = '<span class="grab"></span>' +
+      '<div class="receipt"><h2>Simply Dutch Market</h2><div style="text-align:center;font-size:11px">Kassa 3 · ' + charName + '</div><div class="rule"></div>' +
+      chosen.map((c, i) => '<div class="line"><span>' + labels[i] + '</span><span lang="nl">' + c + '</span></div>').join('') +
+      '<div class="rule"></div><div class="line"><span>Daan says</span><span lang="nl">Fijne dag!</span></div></div>' +
+      '<div class="mission"><strong>This week’s mission</strong>At a real checkout, answer one question in Dutch. Use one of your phrases above.</div>' +
+      '<button class="go" id="replayBtn" type="button">↻ Watch again (new situation)</button>' +
+      '<button class="ghost" id="nextEpBtn" type="button">Next: You can do this! ▶</button>' +
+      (Bridge.embedded ? '<button class="ghost" id="menuBtn" type="button">All episodes</button>' : '');
+    SCORM.complete();
+    $('nextEpBtn').onclick = () => Bridge.openEpisode(4);
+    if ($('menuBtn')) $('menuBtn').onclick = () => Bridge.backToMenu();
+    $('replayBtn').onclick = () => { if (!running) run(); };
+  }
+
+  // ---------- controls ----------
+  $('startBtn').onclick = () => { $('startLayer').hidden = true; $('rail').hidden = false; beep(); run(); };
+  $('ccBtn').onclick = e => { e.stopPropagation(); cc = (cc + 1) % 3; $('ccLabel').textContent = ccModes[cc]; $('ccBtn').setAttribute('aria-label', 'Subtitles: ' + ccModes[cc]); };
+  // tap the video to pause / play, like a reel
+  $('reel').addEventListener('click', e => {
+    if (!running || frozen) return;
+    if (e.target.closest('.rail, .sheet, .start, button, .subs')) return;
+    paused = !paused;
+    if (paused) { if (currentAudio && !currentAudio.ended) currentAudio.pause(); try { speechSynthesis.pause(); } catch (x) {} }
+    else { if (currentAudio && !currentAudio.ended && currentAudio.currentTime > 0) currentAudio.play().catch(() => {}); try { speechSynthesis.resume(); } catch (x) {} }
+    const f = $('tapflash'); f.textContent = paused ? '❚❚' : '▶'; f.hidden = false; setTimeout(() => { f.hidden = !paused; }, 600);
+  });
+  $('skipBtn').onclick = e => { e.stopPropagation(); skipped = true; stopAudio(); daan.classList.remove('talk'); if (skipWait) skipWait(); };
+  document.querySelectorAll('.person').forEach(b => b.addEventListener('click', () => {
+    charName = b.dataset.char;
+    SCORM.saveChar(charName);
+    $('asName').textContent = charName;
+    $('pickLayer').hidden = true;
+    $('startLayer').hidden = false;
+    $('startBtn').focus({ preventScroll: true });
+  }));
+  $('changeBtn').onclick = () => { $('startLayer').hidden = true; $('pickLayer').hidden = false; };
+  document.querySelectorAll('#pickLayer .person').forEach(b => { const v = b.querySelector('svg'); if (v) v.outerHTML = Bridge.portrait(b.dataset.char); });
+  buildSegs(); preloadPoses();
+  // a returning learner: the LMS remembers the character chosen earlier
+  SCORM.init();
+  const savedChar = SCORM.savedChar();
+  if (savedChar === 'Mira' || savedChar === 'Rahul') {
+    charName = savedChar; $('asName').textContent = charName;
+    $('pickLayer').hidden = true; $('startLayer').hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

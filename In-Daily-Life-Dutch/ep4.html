@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Episode 4: You can do this!</title>
+<link rel="stylesheet" href="shared/reel.css">
+<style>
+/* Episode 4 · "You can do this!"
+   Instructional design: worked example → guided practice (building blocks) → retrieval →
+   final challenge without hints (CCAF, summative, H1–H7) → reflection: confidence before/after,
+   reaction (Kirkpatrick 1) and a real-life mission (Kirkpatrick 3). */
+.bg { position: absolute; inset: 0; background: #EAF5EC url(img/cover_gingham.jpg) center / cover; }
+.e4 { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 14px; }
+.e4 .top { display: flex; flex-direction: column; gap: 6px; }
+.e4 .segs .seg { background: #F9CCC6; height: 4px; }
+.e4 .segs .seg.done { background: var(--brand-green); }
+.e4 .tag { align-self: flex-start; position: relative; z-index: 2; font-weight: 700; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #12301C; background: rgba(255,255,255,.9); border-radius: 999px; padding: 3px 10px; }
+.paper > * { flex: none; }
+.paper { flex: 1; min-height: 0; overflow-y: auto; background: #FFFDF9; border-radius: 20px; box-shadow: 0 8px 22px rgba(31,51,38,.15); padding: 16px 14px; display: flex; flex-direction: column; gap: 11px; color: var(--brand-ink); }
+.paper h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 23px; line-height: 1.15; }
+.paper .lead { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600; color: var(--brand-ink-soft); }
+.paper .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #B4532A; }
+.nav { display: flex; gap: 10px; }
+.btn { flex: 1; font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 17px; border: none; border-radius: 999px; padding: 12px 16px; background: var(--brand-green); color: #12301C; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.15); }
+.btn.ghost { background: #FFFFFF; box-shadow: inset 0 0 0 1.5px var(--brand-pink); }
+.btn[disabled] { opacity: .45; cursor: default; }
+/* building blocks */
+.slots { display: flex; flex-wrap: wrap; gap: 6px; min-height: 52px; padding: 8px; border-radius: 14px; background: var(--brand-blush); border: 2px dashed var(--brand-pink); align-items: center; }
+.slots:empty::before { content: "Tap the blocks in the right order"; font-size: 13px; color: var(--brand-ink-soft); }
+.tray { display: flex; flex-wrap: wrap; gap: 8px; }
+.blk { font: inherit; font-family: var(--font-display); font-weight: 700; font-size: 18px; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; color: var(--brand-ink); box-shadow: 0 3px 0 rgba(31,51,38,.18); transition: transform .15s; }
+.blk:active { transform: translateY(2px); }
+.blk.k-q { background: var(--brand-mint); } .blk.k-v { background: #CDEBD3; } .blk.k-n { background: var(--brand-cream); } .blk.k-p { background: #FFFFFF; box-shadow: inset 0 0 0 2px var(--brand-pink); } .blk.k-y { background: #F9CCC6; }
+.blk.used { visibility: hidden; }
+.blk.fly { animation: blkin .45s ease-out both; }
+@keyframes blkin { from { transform: translateY(18px) scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+.plus { font-weight: 700; color: var(--brand-ink-soft); }
+.result { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--brand-green-text); }
+.en { font-size: 13px; color: var(--brand-ink-soft); font-weight: 600; }
+.fb { border-radius: 14px; padding: 9px 12px; font-size: 14px; font-weight: 600; display: flex; flex-direction: column; gap: 2px; }
+.fb b { font-family: var(--font-display); font-size: 17px; }
+.fb.ok { background: var(--brand-mint); color: var(--brand-green-text); } .fb.no { background: #FBE1DD; color: #8E3B30; } .fb.info { background: var(--brand-cream); color: #5A4A10; }
+.chipline { align-self: flex-start; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 4px 11px; background: var(--brand-cream); color: #5A4A10; }
+.speech { align-self: flex-start; background: #FFFFFF; border: 2px solid var(--brand-pink); border-radius: 18px 18px 18px 4px; padding: 8px 12px; font-family: var(--font-display); font-weight: 700; font-size: 18px; }
+.speech small { display: block; font-family: var(--font-body, inherit); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-ink-soft); }
+.photo { width: 100%; height: 118px; flex: none; object-fit: cover; object-position: center 25%; border-radius: 14px; }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opt { font: inherit; text-align: left; font-weight: 700; font-size: 16px; border: 1.5px solid var(--brand-pink); background: #FFFFFF; color: var(--brand-ink); border-radius: 14px; padding: 10px 14px; cursor: pointer; }
+.opt:hover:not([disabled]) { border-color: var(--brand-green); }
+.opt.right { background: var(--brand-mint); border-color: var(--brand-green); } .opt.wrong { background: #FBE1DD; border-color: #E07A6E; }
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pair { font: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 64px; border: 1.5px solid var(--brand-pink); background: #FFFFFF; border-radius: 14px; cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--brand-ink); }
+.pair img { width: 52px; height: 52px; object-fit: contain; }
+.pair.sel { border-color: var(--brand-green); box-shadow: 0 0 0 3px var(--brand-mint); }
+.pair.done { background: var(--brand-mint); border-color: var(--brand-green); opacity: .65; cursor: default; }
+.pair.shake { animation: shake .3s; } @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.scale { display: flex; justify-content: space-between; gap: 6px; }
+.scale button { font: inherit; font-weight: 700; font-size: 18px; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--brand-pink); background: #FFFFFF; cursor: pointer; color: var(--brand-ink); }
+.scale button.on { background: var(--brand-green); border-color: var(--brand-green); color: #12301C; }
+.ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--brand-ink-soft); font-weight: 600; }
+.score { font-family: var(--font-display); font-weight: 700; font-size: 44px; color: var(--brand-green-text); line-height: 1; }
+.cando { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.cando li { font-size: 14px; font-weight: 600; background: var(--brand-mint); border-radius: 12px; padding: 7px 10px; }
+.cando li::before { content: "✓ "; color: var(--brand-green-text); font-weight: 700; }
+.bigbadge { width: 150px; align-self: center; filter: drop-shadow(0 8px 12px rgba(0,0,0,.2)); }
+.confbar { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.saved { font-size: 13px; font-weight: 700; border-radius: 12px; padding: 7px 10px; background: var(--brand-cream); color: #5A4A10; }
+.saved.ok { background: var(--brand-mint); color: var(--brand-green-text); }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><span class="proto">Dutch for Daily Life · Supermarkt · Episode 4</span></div>
+  <div class="reel" id="reel">
+    <div class="bg"></div>
+    <div class="e4">
+      <div class="top"><div class="segs" id="segs"></div><span class="tag" id="tag">Episode 4 of 4</span></div>
+      <div class="paper" id="paper" aria-live="polite"></div>
+      <div class="nav"><button class="btn" id="nextBtn" type="button">Next ▸</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="shared/bridge.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const B = window.Bridge;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const charName = B.getChar() || 'Mira';
+  const who = charName.toLowerCase();
+
+  /* ---------- sound: recorded lines from earlier episodes + tiny effects ---------- */
+  const LEARNER = ['Ja, hier.', 'Ja, momentje.', 'Ja, hoor.', 'Nee, sorry.', 'Nee, die heb ik niet.', 'Nee, helaas.', 'Nee, dank je.', 'Nee, hoeft niet.',
+    'Nee, ik heb zelf een tas.', 'Ja, graag.', 'Ja, alstublieft.', 'Ja, doe maar.', 'Ja, pinnen.', 'Ja, met de kaart.', 'Nee, laat maar.', 'Jij ook!', 'Dank je, jij ook!', 'Doei!', 'Ja!'];
+  const DAAN = { 'Hoi! Heb je een bonuskaart?': '01', 'Wil je een tasje?': '04', 'Dat is dan twaalf euro veertig. Pinnen?': '07', 'Wil je de bon?': '09', 'Fijne dag!': '11' };
+  function srcFor(text, speaker) {
+    if (speaker === 'daan') return DAAN[text] ? `audio/sdm_e08_daan_${DAAN[text]}.mp3` : null;
+    if (speaker === 'sanne') return text === 'De melk? Daar, achterin. Links.' ? 'audio/sdm_e01_sanne_02.mp3' : null;
+    if (text === 'Sorry, waar is de melk?') return `audio/sdm_e01_${who}_say_01.mp3`;
+    const i = LEARNER.indexOf(text); return i >= 0 ? `audio/sdm_e08_${who}_${String(i + 1).padStart(2, '0')}.mp3` : null;
+  }
+  let au = null;
+  function say(text, speaker) { try { if (au) au.pause(); } catch (e) {} const s = srcFor(text, speaker); if (!s) return; au = new Audio(s); au.onerror = () => {}; const p = au.play(); if (p && p.catch) p.catch(() => {}); }
+  let ctx = null;
+  function tone(f, d, type = 'sine', v = .1, at = 0, slide) {
+    try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === 'suspended') ctx.resume(); } catch (e) { return; }
+    const o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + at;
+    o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + d);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + d + .05);
+  }
+  const FX = { click: () => tone(700, .06, 'sine', .06), right: () => { tone(880, .14, 'sine', .09); tone(1320, .25, 'sine', .08, .12); }, wrong: () => tone(220, .22, 'triangle', .08, 0, 160), win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .45, 'triangle', .07, i * .12)) };
+
+  /* ---------- building blocks ---------- */
+  // kind: q = question opener, v = verb, n = thing, p = punctuation, y = yes/no
+  function blocksTask(opts) {
+    // opts: { target: [[text, kind]...], extra: [[text, kind]...], onDone(ok, built) , hint(builtStr) }
+    const wrap = document.createElement('div'); wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.gap = '10px';
+    wrap.innerHTML = '<div class="slots" id="slots"></div><div class="tray" id="tray"></div><div id="bfb"></div><button class="btn" id="checkBtn" type="button" disabled>Check</button>';
+    const pool = opts.target.concat(opts.extra || []).map((b, i) => ({ t: b[0], k: b[1], id: i })).sort(() => Math.random() - .5);
+    let placed = [], tries = 0;
+    const tray = wrap.querySelector('#tray'), slots = wrap.querySelector('#slots'), check = wrap.querySelector('#checkBtn');
+    function render() {
+      tray.innerHTML = pool.map(b => `<button type="button" class="blk k-${b.k}${placed.includes(b.id) ? ' used' : ''}" data-id="${b.id}" lang="nl">${b.t}</button>`).join('');
+      slots.innerHTML = placed.map(id => { const b = pool.find(x => x.id === id); return `<button type="button" class="blk k-${b.k} fly" data-id="${b.id}" lang="nl">${b.t}</button>`; }).join('');
+      tray.querySelectorAll('.blk').forEach(el => el.onclick = () => { if (placed.length < opts.target.length) { FX.click(); placed.push(+el.dataset.id); render(); } });
+      slots.querySelectorAll('.blk').forEach(el => el.onclick = () => { FX.click(); placed = placed.filter(x => x !== +el.dataset.id); render(); });
+      check.disabled = placed.length !== opts.target.length;
+    }
+    check.onclick = () => {
+      tries++;
+      const built = placed.map(id => pool.find(x => x.id === id).t);
+      const ok = built.join(' ') === opts.target.map(b => b[0]).join(' ');
+      const fb = wrap.querySelector('#bfb');
+      if (ok) { FX.right(); fb.innerHTML = `<div class="fb ok"><b>${tries === 1 ? 'Perfect!' : 'Ja, dat klopt!'}</b><span>${opts.okText || ''}</span></div>`; check.classList.add('hidden'); tray.querySelectorAll('.blk').forEach(b => b.disabled = true); slots.querySelectorAll('.blk').forEach(b => b.disabled = true); }
+      else { FX.wrong(); fb.innerHTML = `<div class="fb no"><b>Bijna!</b><span>${(opts.hint && opts.hint(built)) || 'Almost. Look at the order again.'}</span></div>`; }
+      if (ok || tries >= 3) opts.onDone(ok, built.join(' '), tries);
+      if (!ok && tries >= 3) { placed = []; opts.target.forEach(tb => { const b = pool.find(x => x.t === tb[0] && !placed.includes(x.id)); placed.push(b.id); }); render(); check.classList.add('hidden'); fb.innerHTML += `<div class="fb info"><b>Here it is:</b><span lang="nl">${opts.target.map(b => b[0]).join(' ')}</span></div>`; }
+    };
+    render();
+    return wrap;
+  }
+
+  /* ---------- the screens ---------- */
+  let final = { score: 0, total: 0, answers: [] }, conf1 = 0, useful = 0, mission = '';
+  const imgBase = charName === 'Rahul' ? 'img/rahul/' : 'img/';
+  const S = [];
+  const P = () => $('paper');
+  function next(enabled = true, label = 'Next ▸') { const b = $('nextBtn'); b.disabled = !enabled; b.textContent = label; }
+
+  // 0 · intro
+  S.push(() => {
+    $('tag').textContent = 'Episode 4 of 4 · You can do this!';
+    P().innerHTML = `<span class="eyebrow">The last episode</span><h2>You can do this! 💪</h2>
+      <p class="lead">You know the secrets, you went shopping and you talked to Daan. Now: put the pieces together.</p>
+      <ul class="cando"><li><b>Part 1 · Build your Dutch.</b> Small blocks, big sentences.</li><li><b>Part 2 · Final challenge.</b> A real shopping trip, no hints.</li><li><b>Part 3 · Look back.</b> How do you feel now?</li></ul>
+      <p class="en">About 7 minutes.</p>`;
+    next(true, "Let's go ▸");
+  });
+
+  // 1 · worked example: Sorry, waar is + de … + ?
+  S.push(async () => {
+    $('tag').textContent = 'Part 1 · Build your Dutch';
+    P().innerHTML = `<span class="eyebrow">Building block 1 · asking</span><h2>Put this here, add that next to it…</h2>
+      <p class="lead">Watch how one question is built.</p><div class="slots" id="demo"></div><div id="demoText"></div>`;
+    next(false);
+    const steps = [['Sorry,', 'q', 'Start polite: <b>Sorry,</b> = excuse me'], ['waar is', 'v', 'Add <b>waar is</b> = where is'], ['de melk', 'n', 'Add the thing you need: <b>de melk</b>'], ['?', 'p', 'Finish with <b>?</b> … and you have a question!']];
+    for (const [t, k, txt] of steps) {
+      await sleep(900);
+      $('demo').insertAdjacentHTML('beforeend', `<span class="blk k-${k} fly" lang="nl">${t}</span>`); FX.click();
+      $('demoText').innerHTML = `<p class="lead">${txt}</p>`;
+    }
+    await sleep(700);
+    say('Sorry, waar is de melk?');
+    $('demoText').innerHTML = `<div class="result" lang="nl">Sorry, waar is de melk?</div><div class="en">Excuse me, where is the milk?</div>
+      <div class="fb info"><b>The magic trick</b><span>Swap only the last block, and you can ask for <i>anything</i>: de kaas, het brood, de kassa…</span></div>`;
+    next(true);
+  });
+
+  // 2 · practice: where is the cheese?
+  S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Your turn</span><h2>You need cheese. Ask!</h2><p class="lead">Tap the blocks in the right order.</p><div id="task"></div>`;
+    next(false);
+    $('task').appendChild(blocksTask({ target: [['Sorry,', 'q'], ['waar is', 'v'], ['de kaas', 'n'], ['?', 'p']], extra: [['het brood', 'n']], okText: 'Sorry, waar is de kaas? = Excuse me, where is the cheese?',
+      hint: b => b[2] === 'het brood' ? 'You need cheese, not bread. Kaas = cheese.' : 'Start polite with “Sorry,” then “waar is”.', onDone: (ok, built, tries) => { B.interaction('ep4_build_kaas', built, ok && tries === 1 ? 'correct' : 'wrong'); next(true); } }));
+  });
+
+  // 3 · practice: plural → zijn
+  S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Your turn · one new block</span><h2>Now ask for the oranges</h2>
+      <p class="lead">More than one thing? Use <b lang="nl">waar zijn</b> instead of <b lang="nl">waar is</b>.</p><div id="task"></div>`;
+    next(false);
+    $('task').appendChild(blocksTask({ target: [['Sorry,', 'q'], ['waar zijn', 'v'], ['de sinaasappels', 'n'], ['?', 'p']], extra: [['waar is', 'v']], okText: 'Sorry, waar zijn de sinaasappels? = Excuse me, where are the oranges?',
+      hint: b => b.includes('waar is') ? 'Almost! Sinaasappels is more than one, so it’s <b>waar zijn</b>. (People would still understand you!)' : 'Start polite with “Sorry,”.', onDone: (ok, built, tries) => { B.interaction('ep4_build_zijn', built, ok && tries === 1 ? 'correct' : 'wrong'); next(true); } }));
+  });
+
+  // 4 · worked example 2: answering = Ja/Nee + graag/dank je
+  S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Building block 2 · answering</span><h2>Two blocks answer almost every checkout question</h2>
+      <div class="slots"><span class="blk k-y">Ja,</span><span class="plus">+</span><span class="blk k-n">graag.</span></div><div class="en">Ja, graag. = Yes, please.</div>
+      <div class="slots"><span class="blk k-y">Nee,</span><span class="plus">+</span><span class="blk k-n">dank je.</span></div><div class="en">Nee, dank je. = No, thank you.</div>
+      <div class="fb info"><b>Tasje? Bon? Pinnen?</b><span>Listen for the key word, then choose your two blocks. That's it.</span></div>`;
+    say('Ja, graag.'); setTimeout(() => say('Nee, dank je.'), 1600);
+    next(true);
+  });
+
+  // 5 · practice: three quick answers
+  const QUICK = [
+    { q: 'Wil je een tasje?', en: 'Would you like a bag?', chip: 'You have your own bag', target: [['Nee,', 'y'], ['dank je.', 'n']], pose: 'daan_bag' },
+    { q: 'Wil je de bon?', en: 'Would you like the receipt?', chip: 'You want the receipt', target: [['Ja,', 'y'], ['graag.', 'n']], pose: 'daan_bon' },
+    { q: 'Dat is dan twaalf euro veertig. Pinnen?', en: "That's €12.40. Paying by card?", chip: 'You pay by card', target: [['Ja,', 'y'], ['graag.', 'n']], pose: 'daan_pin' }
+  ];
+  QUICK.forEach((it, i) => S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Your turn · answer ${i + 1} of 3</span><img class="photo" src="${imgBase}${it.pose}.jpg" alt="Daan at the checkout">
+      <div class="speech"><small>Daan</small><span lang="nl">${it.q}</span></div><div class="en">${it.en}</div><span class="chipline">${it.chip}</span><div id="task"></div>`;
+    say(it.q, 'daan'); next(false);
+    $('task').appendChild(blocksTask({ target: it.target, extra: [it.target[0][0] === 'Ja,' ? ['Nee,', 'y'] : ['Ja,', 'y'], it.target[1][0] === 'graag.' ? ['dank je.', 'n'] : ['graag.', 'n']],
+      okText: it.target.map(b => b[0]).join(' '), hint: b => b[0] !== it.target[0][0] ? `Look at the yellow note: <b>${it.chip.toLowerCase()}</b>.` : 'With “Ja,” use “graag.”, with “Nee,” use “dank je.”',
+      onDone: (ok, built, tries) => { if (ok) say(built); B.interaction('ep4_answer_' + (i + 1), built, ok && tries === 1 ? 'correct' : 'wrong'); next(true); } }));
+  }));
+
+  // 6 · retrieval: match the word to the picture
+  S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Quick memory check</span><h2>Match each word to its picture</h2><p class="lead">Tap a picture, then its Dutch word.</p><div class="pairs" id="pairs"></div><div id="mfb"></div>`;
+    next(false);
+    const W = [['sinaasappel', 'de sinaasappel'], ['kaas', 'de kaas'], ['brood', 'het brood'], ['melk', 'de melk']];
+    const cards = W.map(w => ({ k: w[0], type: 'img' })).concat(W.map(w => ({ k: w[0], type: 'word', t: w[1] }))).sort(() => Math.random() - .5);
+    $('pairs').innerHTML = cards.map((c, i) => `<button type="button" class="pair" data-i="${i}" data-k="${c.k}" data-type="${c.type}">${c.type === 'img' ? `<img src="img/badge_${c.k}.png" alt="">` : `<span lang="nl">${c.t}</span>`}</button>`).join('');
+    let sel = null, matched = 0, errors = 0;
+    $('pairs').querySelectorAll('.pair').forEach(el => el.onclick = () => {
+      if (el.classList.contains('done')) return;
+      if (!sel || sel.dataset.type === el.dataset.type) { $('pairs').querySelectorAll('.pair').forEach(x => x.classList.remove('sel')); sel = el; el.classList.add('sel'); FX.click(); return; }
+      if (sel.dataset.k === el.dataset.k) { sel.classList.add('done'); el.classList.add('done'); sel.classList.remove('sel'); sel = null; matched++; FX.right(); if (matched === 4) { $('mfb').innerHTML = `<div class="fb ok"><b>${errors ? 'Goed zo!' : 'Perfect memory!'}</b><span>All four words, from Episode 2. They stuck!</span></div>`; B.interaction('ep4_match', `errors:${errors}`, errors ? 'wrong' : 'correct'); next(true); } }
+      else { errors++; FX.wrong(); el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 350); }
+    });
+  });
+
+  // final challenge intro (context)
+  const FINAL_INTRO = () => {
+    $('tag').textContent = 'Part 2 · Final challenge';
+    P().innerHTML = `<span class="eyebrow">Final challenge</span><h2>Saturday at Simple Dutch Market</h2>
+      <p class="lead">Guests are coming. You go shopping on your own. <b>No hints, no translations.</b> Just you and your Dutch.</p>
+      <div class="fb info"><b>7 moments</b><span>Find it, read it, ask for it, understand the answer, and get through the checkout.</span></div>`;
+    next(true, "I'm ready ▸");
+  };
+  S.push(FINAL_INTRO);
+
+  // 8–14 · final challenge (scored)
+  const FINAL = [
+    { id: 'sign', h: 'You need milk. Which sign do you look for?', img: 'img/aisle.jpg', opts: ['Zuivel', 'Brood', 'Groente en fruit'], a: 0, why: '<b>Zuivel</b> = dairy: milk, yoghurt, cheese.' },
+    { id: 'deal', h: 'You need two pieces of cheese. Which is cheaper?', img: 'img/cheese.jpg', opts: ['€ 4,00 · 2e halve prijs', '€ 3,50 per stuk'], a: 0, why: '€4 + €2 = €6, and 2 × €3,50 = €7. <b>2e halve prijs</b> wins.' },
+    { id: 'ask', h: 'Sanne is right there. Ask her where the milk is.', build: [['Sorry,', 'q'], ['waar is', 'v'], ['de melk', 'n'], ['?', 'p']], extra: [['waar zijn', 'v'], ['de kassa', 'n']], why: 'Sorry, waar is de melk?' },
+    { id: 'dir', h: 'Sanne answers:', speech: ['Sanne', 'De melk? Daar, achterin. Links.'], speaker: 'sanne', img: imgBase + 'sanne_point.jpg', opts: ['↖ At the back, on the left', '↗ At the back, on the right', '← Near the entrance, on the left'], a: 0, why: '<b>Achterin</b> = at the back. <b>Links</b> = left.' },
+    { id: 'card', h: 'At the checkout. You don\'t have a bonus card.', speech: ['Daan', 'Hoi! Heb je een bonuskaart?'], speaker: 'daan', img: imgBase + 'daan_card.jpg', opts: ['Nee, sorry.', 'Ja, graag.', 'Ja, hier.'], a: 0, why: '<b>Bonuskaart</b> was the key word. No card? <b>Nee, sorry.</b>' },
+    { id: 'pin', h: 'You want to pay with your bank card.', speech: ['Daan', 'Dat is dan twaalf euro veertig. Pinnen?'], speaker: 'daan', img: imgBase + 'daan_pin.jpg', opts: ['Ja, pinnen.', 'Nee, dank je.', 'Ja, hier.'], a: 0, why: '<b>Pinnen</b> = pay by card.' },
+    { id: 'bon', h: 'You don\'t need the receipt.', speech: ['Daan', 'Wil je de bon?'], speaker: 'daan', img: imgBase + 'daan_bon.jpg', opts: ['Nee, dank je.', 'Ja, graag.', 'Ja, pinnen.'], a: 0, why: '<b>Bon</b> = receipt. Don\'t need it? <b>Nee, dank je.</b>' }
+  ];
+  FINAL.forEach((f, i) => S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Final challenge · ${i + 1} of ${FINAL.length}</span>${f.img ? `<img class="photo" src="${f.img}" alt="">` : ''}
+      ${f.speech ? `<div class="speech"><small>${f.speech[0]}</small><span lang="nl">${f.speech[1]}</span></div>` : ''}<h2 style="font-size:19px">${f.h}</h2><div id="task"></div><div id="ffb"></div>`;
+    if (f.speech) say(f.speech[1], f.speaker);
+    next(false);
+    const done = (ok, resp) => {
+      final.total++; if (ok) final.score++; final.answers.push(f.id + ':' + (ok ? 1 : 0));
+      B.interaction('ep4_final_' + f.id, resp, ok ? 'correct' : 'wrong');
+      $('ffb').innerHTML = `<div class="fb ${ok ? 'ok' : 'no'}"><b>${ok ? 'Goed zo!' : 'Not this time.'}</b><span>${f.why}</span></div>`;
+      next(true);
+    };
+    if (f.build) {
+      let first = true;
+      $('task').appendChild(blocksTask({ target: f.build, extra: f.extra, okText: '', hint: () => 'Not quite. Try again.', onDone: (ok, built, tries) => { if (first) { first = false; if (ok) say('Sorry, waar is de melk?'); done(ok && tries === 1, built); } } }));
+      return;
+    }
+    const order = f.opts.map((o, k) => k).sort(() => Math.random() - .5);   // the right answer is not always on top
+    $('task').innerHTML = `<div class="opts">${order.map(k => `<button type="button" class="opt" data-k="${k}" lang="nl">${f.opts[k]}</button>`).join('')}</div>`;
+    $('task').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const k = +b.dataset.k, ok = k === f.a;
+      $('task').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (+x.dataset.k === f.a) x.classList.add('right'); });
+      if (!ok) b.classList.add('wrong');
+      ok ? FX.right() : FX.wrong();
+      if (ok && f.speaker === 'daan') say(f.opts[k]);
+      done(ok, f.opts[k]);
+    });
+  }));
+
+  // 15 · result
+  S.push(() => {
+    $('tag').textContent = 'Final challenge · result';
+    const pass = final.score >= 5;
+    B.setData('final', { score: final.score, total: final.total });
+    B.interaction('ep4_final_score', `${final.score}/${final.total}`, pass ? 'correct' : 'wrong');
+    if (pass) FX.win();
+    P().innerHTML = `<span class="eyebrow">Your score</span><div class="score">${final.score}/${final.total}</div>
+      <h2>${pass ? 'Je kunt het! You can do it!' : 'Almost there!'}</h2>
+      <p class="lead">${pass ? 'You found your way, read the labels, asked for help and got through the checkout. In Dutch.' : 'You need 5 of 7. Every try makes the words stick: have another go!'}</p>
+      ${pass ? '' : '<button class="btn ghost" id="retryBtn" type="button">↻ Try the challenge again</button>'}`;
+    if (!pass) $('retryBtn').onclick = () => { final = { score: 0, total: 0, answers: [] }; go(FINAL_START); };
+    next(true, pass ? 'Next ▸' : 'Continue anyway ▸');
+  });
+
+  // 16 · reflection: confidence after (compare with Episode 2)
+  S.push(() => {
+    $('tag').textContent = 'Part 3 · Look back';
+    const before = Number(B.getData('conf0')) || 0;
+    P().innerHTML = `<span class="eyebrow">Look back</span><h2>How confident do you feel about shopping in Dutch now?</h2>
+      <div class="scale" id="scale">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-v="${n}">${n}</button>`).join('')}</div><div class="ends"><span>Not at all</span><span>Very</span></div><div id="cfb"></div>`;
+    next(false);
+    $('scale').querySelectorAll('button').forEach(b => b.onclick = () => {
+      $('scale').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); FX.click();
+      conf1 = +b.dataset.v; B.setData('conf1', conf1); B.interaction('ep4_confidence_after', String(conf1), 'neutral');
+      $('cfb').innerHTML = before ? `<div class="fb ${conf1 > before ? 'ok' : 'info'}"><span class="confbar">Before: ${before} → Now: ${conf1}</span><span>${conf1 > before ? 'Look at that growth! 🌱' : 'Confidence grows with every real shopping trip.'}</span></div>` : '';
+      next(true);
+    });
+  });
+
+  // 17 · reaction (Kirkpatrick 1) + mission (Kirkpatrick 3)
+  S.push(() => {
+    P().innerHTML = `<span class="eyebrow">Two quick questions</span><h2>How useful was this module for your real life?</h2>
+      <div class="scale" id="use">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-v="${n}">${n}</button>`).join('')}</div><div class="ends"><span>Not useful</span><span>Very useful</span></div>
+      <h2 style="font-size:19px">Your mission this week. Choose one:</h2>
+      <div class="opts" id="mis"><button type="button" class="opt" data-m="ask">🙋 Ask a staff member: “Sorry, waar is de …?”</button><button type="button" class="opt" data-m="answer">💬 Answer the cashier in Dutch: “Nee, dank je.”</button><button type="button" class="opt" data-m="labels">🏷️ Find one “aanbieding” and read it</button></div>`;
+    next(false);
+    const ready = () => next(useful && mission);
+    $('use').querySelectorAll('button').forEach(b => b.onclick = () => { $('use').querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); FX.click(); useful = +b.dataset.v; B.interaction('ep4_usefulness', String(useful), 'neutral'); ready(); });
+    $('mis').querySelectorAll('.opt').forEach(b => b.onclick = () => { $('mis').querySelectorAll('.opt').forEach(x => x.classList.remove('right')); b.classList.add('right'); FX.click(); mission = b.dataset.m; B.setData('mission', mission); B.interaction('ep4_mission', mission, 'neutral'); ready(); });
+  });
+
+  // 18 · closing: you know enough Dutch to do your shopping
+  S.push(() => {
+    $('tag').textContent = 'Module 1 · Supermarkt · complete';
+    B.episodeDone(4);
+    const lms = B.lms();
+    FX.win();
+    P().innerHTML = `${lms && lms.live ? `<div class="saved ok">✓ Saved in Moodle${lms.status === 'completed' ? ' · Supermarkt module completed' : ''}</div>` : '<div class="saved">Preview mode: in Moodle your progress is saved automatically.</div>'}
+      <img class="bigbadge" src="img/badge_supermarkt.png" alt="Supermarkt badge" onerror="this.remove()">
+      <h2>You now know enough Dutch to do your shopping. 🎉</h2>
+      <ul class="cando"><li>Find what you need: <span lang="nl">Zuivel, Brood</span></li><li>Read the labels: <span lang="nl">aanbieding, 2e halve prijs, per kilo</span></li><li>Ask for help: <span lang="nl">Sorry, waar is de …?</span></li><li>Understand the answer: <span lang="nl">achterin, links</span></li><li>Get through the checkout: <span lang="nl">Ja, graag. / Nee, dank je.</span></li></ul>
+      <div class="fb info"><b>Your mission</b><span>${{ ask: 'Ask a staff member: “Sorry, waar is de …?”', answer: 'Answer the cashier in Dutch.', labels: 'Find one “aanbieding” and read it.' }[mission] || 'Use one Dutch sentence at your next shopping trip.'}</span></div>
+      <p class="en">Next module: <b>Bakkerij en markt</b>. See you there!</p>`;
+    next(true, B.embedded ? 'All episodes ▸' : 'Done ✓');
+  });
+
+  const FINAL_START = S.findIndex(f => f === FINAL_INTRO);
+  let cur = -1;
+  $('segs').innerHTML = '<span class="seg"></span>'.repeat(4);
+  function go(i) {
+    cur = i; S[i]();
+    const fs = FINAL_START, part = i < fs ? 1 : i <= fs + FINAL.length + 1 ? 2 : i < S.length - 1 ? 3 : 4;
+    Array.from($('segs').children).forEach((s, k) => s.classList.toggle('done', k < part));
+    P().scrollTop = 0;
+  }
+  $('nextBtn').onclick = () => { FX.click(); try { if (au) au.pause(); } catch (e) {} if (cur < S.length - 1) go(cur + 1); else if (B.embedded) B.backToMenu(); };
+  go(0);
+})();
+</script>
+</body>
+</html>
